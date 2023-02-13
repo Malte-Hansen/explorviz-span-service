@@ -1,6 +1,7 @@
 plugins {
   id 'java'
   id 'io.quarkus'
+  id 'com.adarshr.test-logger' version '3.2.0'
 }
 
 repositories {
@@ -10,26 +11,23 @@ repositories {
 
 dependencies {
   implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+
+  // Cassandra
   implementation enforcedPlatform("${quarkusPlatformGroupId}:quarkus-cassandra-bom:${quarkusPlatformVersion}")
   implementation 'com.datastax.oss.quarkus:cassandra-quarkus-client'
+
+  // Kafka
+  implementation 'io.quarkus:quarkus-kafka-streams'
   implementation 'io.quarkus:quarkus-confluent-registry-avro'
   implementation 'io.quarkus:quarkus-avro'
-  implementation 'io.quarkus:quarkus-kafka-streams'
-  implementation 'io.quarkus:quarkus-arc'
+
+  // Unit Testing
   testImplementation 'io.quarkus:quarkus-junit5'
 }
 
 group 'net.explorviz'
 version '1.0-SNAPSHOT'
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
-}
-
-test {
-  systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
-}
 compileJava {
   options.encoding = 'UTF-8'
   options.compilerArgs << '-parameters'
@@ -37,4 +35,18 @@ compileJava {
 
 compileTestJava {
   options.encoding = 'UTF-8'
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+  // Turn on all javac warnings except classfile and processing, which produces many false-positives about annotations
+  options.compilerArgs << "-Xlint:all" << "-Xlint:-classfile" << "-Xlint:-processing"
+}
+
+test {
+  systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
 }

@@ -1,64 +1,69 @@
-# span-service
+# ExplorViz Span-Service
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Scalable service that processes, persists, aggregates and queries the observed traces of method executions within
+monitored software applications.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## Features
+
+This replaces the [trace-service](https://git.se.informatik.uni-kiel.de/ExplorViz/code/trace-service) and
+[landscape-service](https://git.se.informatik.uni-kiel.de/ExplorViz/code/landscape-service) previously used to process
+spans.
+
+## Prerequisites
+
+- Java 17 or higher
+- Make sure to run the [ExplorViz software stack](https://git.se.informatik.uni-kiel.de/ExplorViz/code/deployment)
+  before starting the service, as it provides the required database(s) and the Kafka broker
 
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
-
 ```shell script
 ./gradlew quarkusDev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+This also enables the `dev` configuration profile, i.e. using the properties prefixed with `%dev` from
+`src/main/resources/application.properties`.
+
+**_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
 
 ## Packaging and running the application
 
-The application can be packaged using:
-
+The application can be packaged and tested using:
 ```shell script
 ./gradlew build
 ```
-
 It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
+
+You can skip running the integration tests by adding `-x integrationTest`. To skip all tests and code analysis use the
+`assemble` task instead of `build`.
 
 The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
+Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
 
-If you want to build an _über-jar_, execute the following command:
-
+If you want to build an _über-jar_, which includes the entire application in a single jar file, execute the following
+command:
 ```shell script
 ./gradlew build -Dquarkus.package.type=uber-jar
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
+The application, packaged as an _über-jar_, is now runnable using
+`java -jar build/span-service-1.0-SNAPSHOT-runner.jar`.
+You can add `-Dquarkus.profile=dev` to enable the `%dev` properties.
 
 ## Creating a native executable
 
 You can create a native executable using:
-
 ```shell script
 ./gradlew build -Dquarkus.package.type=native
 ```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
 ```shell script
 ./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
 ```
 
 You can then execute your native executable with: `./build/span-service-1.0-SNAPSHOT-runner`
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling.
-
-## Related Guides
-
-- DataStax Apache Cassandra client ([guide](https://quarkus.io/guides/cassandra)): Connect to Apache Cassandra, DataStax
-  Enterprise and DataStax Astra databases
-- Confluent Schema Registry - Avro ([guide](https://quarkus.io/guides/kafka-schema-registry-avro)): Use Confluent as
-  Avro schema registry
-- Apache Avro ([guide](https://quarkus.io/guides/kafka)): Provide support for the Avro data serialization system
-- Apache Kafka Streams ([guide](https://quarkus.io/guides/kafka-streams)): Implement stream processing applications
-  based on Apache Kafka
+If you want to learn more about building native executables, please consult
+https://quarkus.io/guides/gradle-tooling#building-a-native-executable.
