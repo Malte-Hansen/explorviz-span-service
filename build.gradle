@@ -15,17 +15,21 @@ repositories {
 dependencies {
   implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
 
-  // Base
+  // Needed for @Scheduled annotations
   implementation 'io.quarkus:quarkus-scheduler'
 
-  // Cassandra
+  // Quarkus Cassandra Platform + DataStax Cassandra Driver
   implementation enforcedPlatform("${quarkusPlatformGroupId}:quarkus-cassandra-bom:${quarkusPlatformVersion}")
   implementation 'com.datastax.oss.quarkus:cassandra-quarkus-client'
 
-  // Kafka
+  // Kafka Streams + Confluent Schema Registry + Avro (de)serializer
   implementation 'io.quarkus:quarkus-kafka-streams'
   implementation 'io.quarkus:quarkus-confluent-registry-avro'
   implementation group: 'io.confluent', name: 'kafka-streams-avro-serde', version: "${confluentAvroSerdeVersion}"
+
+  // REST implementation (Jackson serialization) + MicroProfile OpenAPI specification
+  implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
+  implementation 'io.quarkus:quarkus-smallrye-openapi'
 }
 
 group 'net.explorviz'
