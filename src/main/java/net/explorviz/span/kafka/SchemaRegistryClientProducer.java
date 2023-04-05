@@ -1,4 +1,4 @@
-package net.explorviz.span.injection;
+package net.explorviz.span.kafka;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
