@@ -7,10 +7,16 @@ plugins {
 repositories {
   mavenCentral()
   mavenLocal()
+  maven {
+    url "https://packages.confluent.io/maven/"
+  }
 }
 
 dependencies {
   implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+
+  // Base
+  implementation 'io.quarkus:quarkus-scheduler'
 
   // Cassandra
   implementation enforcedPlatform("${quarkusPlatformGroupId}:quarkus-cassandra-bom:${quarkusPlatformVersion}")
@@ -19,10 +25,7 @@ dependencies {
   // Kafka
   implementation 'io.quarkus:quarkus-kafka-streams'
   implementation 'io.quarkus:quarkus-confluent-registry-avro'
-  implementation 'io.quarkus:quarkus-avro'
-
-  // Unit Testing
-  testImplementation 'io.quarkus:quarkus-junit5'
+  implementation group: 'io.confluent', name: 'kafka-streams-avro-serde', version: "${confluentAvroSerdeVersion}"
 }
 
 group 'net.explorviz'
