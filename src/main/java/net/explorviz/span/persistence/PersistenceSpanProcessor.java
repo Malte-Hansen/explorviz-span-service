@@ -67,9 +67,12 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
             uuid -> ConcurrentHashMap.newKeySet());
 
         if (knownHashes.add(span.methodHashCode())) {
-            LOGGER.debug("Inserting new structure with hash_code={}, method_fqn={}", span.methodHashCode(), span.methodFqn());
+            LOGGER.debug("Inserting new structure with hash_code={}, method_fqn={}",
+                span.methodHashCode(), span.methodFqn());
             insertSpanStructure(span);
         }
+
+        // TODO: We should probably only insert spans after corresponding span_structure has been inserted
 
         if (span.parentSpanId() == 0) {
             insertTrace(span);
@@ -140,7 +143,9 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
                 lastSavesSpanStructures.incrementAndGet();
             } else {
                 lastFailures.incrementAndGet();
-                LOGGER.error("Could not persist structure", failure);
+                LOGGER.error("Could not persist structure with hash {}, removing from cache",
+                    span.methodFqn(), failure);
+                knownHashesByLandscape.get(span.landscapeToken()).remove(span.methodHashCode());
             }
         });
     }
