@@ -1,10 +1,9 @@
-package net.explorviz.span.service.processor;
+package net.explorviz.span.persistence;
 
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.quarkus.runtime.api.session.QuarkusCqlSession;
 import io.quarkus.scheduler.Scheduled;
-import net.explorviz.span.persistence.PersistenceSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
