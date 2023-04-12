@@ -65,7 +65,7 @@ public class TopologyProducer {
 
         if (LOGGER.isTraceEnabled()) {
             persistenceStream.foreach((token, span) -> LOGGER.trace("Span {} has hash code {}: {}",
-                Long.toHexString(span.spanId()), Long.toHexString(span.methodHashCode()), span.methodFqn()));
+                Long.toHexString(span.spanId()), Long.toHexString(span.methodHash()), span.methodFqn()));
         }
 
         persistenceStream.foreach((token, span) -> persistenceProcessor.accept(span));

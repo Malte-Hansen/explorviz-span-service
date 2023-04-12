@@ -28,18 +28,18 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
         long traceId = Long.parseUnsignedLong(span.getTraceId().substring(0, 16), 16); // TODO: Truncated trace id?
         long startTime = span.getStartTimeEpochMilli() * 1_000_000L;
         long endTime = span.getEndTimeEpochMilli() * 1_000_000L;
-        String hostIpAddress = span.getHostIpAddress();
-        String appName = span.getAppName();
-        int appInstanceId = Integer.parseInt(span.getAppInstanceId());
-        String appLanguage = span.getAppLanguage();
+        String nodeIpAddress = span.getHostIpAddress();
+        String applicationName = span.getAppName();
+        int applicationInstance = Integer.parseInt(span.getAppInstanceId());
+        String applicationLanguage = span.getAppLanguage();
         String methodFqn = span.getFullyQualifiedOperationName();
 
         long methodHashCode = HashHelper.calculateSpanHash(
-            landscapeToken, hostIpAddress, appName, appInstanceId, methodFqn
+            landscapeToken, nodeIpAddress, applicationName, applicationInstance, methodFqn
         );
         return new PersistenceSpan(
-            landscapeToken, spanId, parentSpanId, traceId, startTime, endTime, hostIpAddress, appName, appInstanceId,
-            appLanguage, methodFqn, methodHashCode
+            landscapeToken, spanId, parentSpanId, traceId, startTime, endTime, nodeIpAddress, applicationName,
+            applicationLanguage, applicationInstance, methodFqn, methodHashCode
         );
     }
 }
