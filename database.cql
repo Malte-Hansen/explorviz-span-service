@@ -12,7 +12,7 @@ CREATE TABLE explorviz.span_by_time
     PRIMARY KEY ((landscape_token, start_time_s), start_time_ns, hash_code, span_id)
 );
 
-// SELECT trace_idFROM traceid_by_time WHERE landscape_token = X AND start_time_s = X;
+// SELECT trace_id FROM traceid_by_time WHERE landscape_token = X AND start_time_s = X;
 
 // Get complete traces by their trace id
 CREATE TABLE explorviz.span_by_traceid
@@ -61,6 +61,6 @@ CREATE TABLE explorviz.span_structure
     application_language text,
     instance_id          int,
     method_fqn           text,
-    // TODO: time field so we can ask "span structure up to time X"
+    time_seen            bigint,
     PRIMARY KEY ((landscape_token), hash_code)
 );

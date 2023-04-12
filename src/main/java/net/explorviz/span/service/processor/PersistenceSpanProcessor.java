@@ -57,8 +57,9 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
         this.insertSpanStructure = session.prepare(
             "INSERT INTO span_structure "
                 + "(landscape_token, hash_code, host_ip_address, application_name, application_language, instance_id, "
-                + "method_fqn) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+                + "method_fqn, time_seen) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+                + "USING TIMESTAMP ?");
     }
 
     @Override
@@ -125,10 +126,14 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
         });
     }
 
+    private long computeStructureWriteTimestamp(PersistenceSpan span) {
+        return Integer.MAX_VALUE - span.getStartTimeSeconds(); // TODO
+    }
+
     private void insertSpanStructure(PersistenceSpan span) {
         BoundStatement stmtStructure = insertSpanStructure.bind(
             span.landscapeToken(), span.methodHashCode(), span.hostIpAddress(), span.appName(), span.appLanguage(),
-            span.appInstanceId(), span.methodFqn()
+            span.appInstanceId(), span.methodFqn(), span.startTime(), computeStructureWriteTimestamp(span)
         );
 
         session.executeAsync(stmtStructure).whenComplete((result, failure) -> {
@@ -136,7 +141,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
                 lastSavesSpanStructures.incrementAndGet();
             } else {
                 lastFailures.incrementAndGet();
-                //LOGGER.error("Could not persist structure", failure);
+                LOGGER.error("Could not persist structure", failure);
             }
         });
     }
