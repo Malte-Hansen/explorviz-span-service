@@ -1,4 +1,4 @@
-package net.explorviz.span.service.converter;
+package net.explorviz.span.converter;
 
 import net.explorviz.avro.Span;
 import net.explorviz.span.persistence.PersistenceSpan;

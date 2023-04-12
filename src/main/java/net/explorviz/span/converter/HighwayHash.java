@@ -1,4 +1,4 @@
-package net.explorviz.span.service.converter;
+package net.explorviz.span.converter;
 
 /**
  * HighwayHash algorithm. See <a href="https://github.com/google/highwayhash">

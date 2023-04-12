@@ -1,4 +1,4 @@
-package net.explorviz.span.service.converter;
+package net.explorviz.span.converter;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;

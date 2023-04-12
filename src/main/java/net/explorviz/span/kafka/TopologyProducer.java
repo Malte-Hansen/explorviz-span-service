@@ -3,7 +3,7 @@ package net.explorviz.span.kafka;
 import io.quarkus.scheduler.Scheduled;
 import net.explorviz.avro.Span;
 import net.explorviz.span.persistence.PersistenceSpan;
-import net.explorviz.span.service.converter.SpanConverter;
+import net.explorviz.span.converter.SpanConverter;
 import net.explorviz.span.persistence.PersistenceSpanProcessor;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
