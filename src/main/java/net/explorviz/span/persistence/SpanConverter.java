@@ -1,7 +1,7 @@
-package net.explorviz.span.converter;
+package net.explorviz.span.persistence;
 
 import net.explorviz.avro.Span;
-import net.explorviz.span.persistence.PersistenceSpan;
+import net.explorviz.span.hash.HashHelper;
 import org.apache.kafka.streams.kstream.ValueMapper;
 
 import javax.enterprise.context.ApplicationScoped;
