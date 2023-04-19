@@ -10,6 +10,7 @@ import net.explorviz.span.landscape.assembler.LandscapeAssemblyException;
  * Helper class for building/accessing package hierarchies out of strings.
  */
 public final class PackageHelper {
+
   private PackageHelper() {
     /* Utility class */
   }
@@ -68,7 +69,7 @@ public final class PackageHelper {
         current = current.subPackages().stream().filter(p -> p.name().equals(packages[finalI]))
             .findFirst().orElse(null);
       } else {
-        current = null;
+        current = null; // NOPMD
       }
     }
     return i;

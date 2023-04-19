@@ -23,7 +23,7 @@ public class LandscapeLoader {
   private final PreparedStatement selectSpanStructure;
   private final PreparedStatement selectSpanStructureByTime;
 
-  public LandscapeLoader(QuarkusCqlSession session) {
+  public LandscapeLoader(final QuarkusCqlSession session) {
     this.session = session;
 
     this.selectSpanStructure =
@@ -33,21 +33,23 @@ public class LandscapeLoader {
             + "AND time_seen <= ? " + "ALLOW FILTERING");
   }
 
-  public Multi<LandscapeRecord> loadLandscape(UUID landscapeToken) {
+  public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken) {
     LOGGER.debug("Loading landscape {}", landscapeToken);
 
-    BoundStatement stmtSelect = selectSpanStructure.bind(landscapeToken);
+    final BoundStatement stmtSelect = selectSpanStructure.bind(landscapeToken);
     return executeQuery(stmtSelect);
   }
 
-  public Multi<LandscapeRecord> loadLandscape(UUID landscapeToken, long from, long to) {
+  public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken, final long from,
+      final long to) {
     LOGGER.debug("Loading landscape {} in time range {}-{}", landscapeToken, from, to);
 
-    BoundStatement stmtSelectByTime = selectSpanStructureByTime.bind(landscapeToken, from, to);
+    final BoundStatement stmtSelectByTime =
+        selectSpanStructureByTime.bind(landscapeToken, from, to);
     return executeQuery(stmtSelectByTime);
   }
 
-  private Multi<LandscapeRecord> executeQuery(BoundStatement stmtSelect) {
+  private Multi<LandscapeRecord> executeQuery(final BoundStatement stmtSelect) {
     lastRequestedLandscapes.incrementAndGet();
 
     return session.executeReactive(stmtSelect).map(LandscapeRecord::fromRow).onItem()

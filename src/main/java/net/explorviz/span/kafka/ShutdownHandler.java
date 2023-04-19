@@ -23,13 +23,14 @@ public class ShutdownHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHandler.class);
 
   @Inject
-  KafkaStreams streams;
+  /* default */ KafkaStreams streams;
 
-  void onStart(@Observes final StartupEvent ev) {
+  /* default */ void onStart(@Observes final StartupEvent ev) {
     this.streams.setStateListener(new ErrorStateListener());
   }
 
-  void onStop(@Observes final ShutdownEvent ev) {
+  /* default */ void onStop(@Observes final ShutdownEvent ev) {
+    // nothing to do
   }
 
   private static class ErrorStateListener implements StateListener {

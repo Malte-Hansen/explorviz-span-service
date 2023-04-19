@@ -54,7 +54,7 @@ public class DefaultLandscapeAssembler implements LandscapeAssembler {
   }
 
   private Node getNodeForRecord(final Landscape landscape, final LandscapeRecord record) {
-    Node node;
+    final Node node;
 
     final String ipAddress = record.nodeIpAddress();
 
@@ -72,7 +72,7 @@ public class DefaultLandscapeAssembler implements LandscapeAssembler {
   }
 
   private Application getApplicationForRecord(final LandscapeRecord record, final Node node) {
-    Application app;
+    final Application app;
 
     // Find application in node or insert new
     final String applicationName = record.applicationName();
@@ -116,7 +116,7 @@ public class DefaultLandscapeAssembler implements LandscapeAssembler {
 
   private Class getClassForRecord(final LandscapeRecord record, final Package leafPkg) {
     // Get or creat class
-    Class cls;
+    final Class cls;
     final Optional<Class> foundCls = AssemblyUtils.findClazz(leafPkg, record.className());
     if (foundCls.isPresent()) {
       cls = foundCls.get();

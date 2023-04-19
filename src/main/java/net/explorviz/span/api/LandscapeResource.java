@@ -43,11 +43,11 @@ public class LandscapeResource {
           schema = @Schema(implementation = Object.class))))
   public Uni<Landscape> getLandscape(@PathParam("token") String token,
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
-    if (token.equals("mytokenvalue")) {
-      token = "7cd8a9a7-b840-4735-9ef0-2dbbfa01c039"; // TODO: Remove invalid token hotfix
+    if ("mytokenvalue".equals(token)) {
+      token = "7cd8a9a7-b840-4735-9ef0-2dbbfa01c039"; // TODO: Remove invalid token hotfix NOPMD
     }
 
-    Multi<LandscapeRecord> recordMulti;
+    final Multi<LandscapeRecord> recordMulti;
     // TODO: Determine if we should allow from/to alone
     if (from == null || to == null) {
       // TODO: Cache (shared with PersistenceSpanProcessor?)

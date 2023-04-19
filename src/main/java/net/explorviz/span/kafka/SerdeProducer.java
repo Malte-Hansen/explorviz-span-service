@@ -17,10 +17,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 @Dependent
 public class SerdeProducer {
   @Inject
-  SchemaRegistryClient registry;
+  /* default */ SchemaRegistryClient registry;
 
   @ConfigProperty(name = "quarkus.kafka-streams.schema-registry-url")
-  String schemaRegistryUrl;
+  /* default */ String schemaRegistryUrl;
 
   @Produces
   @DefaultBean

@@ -11,6 +11,7 @@ public class InvalidRecordException extends LandscapeAssemblyException {
   private static final long serialVersionUID = 1L;
 
   public InvalidRecordException() {
+    super();
   }
 
   public InvalidRecordException(final String message) {

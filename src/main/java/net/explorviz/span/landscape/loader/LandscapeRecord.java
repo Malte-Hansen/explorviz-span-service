@@ -9,15 +9,15 @@ public record LandscapeRecord(UUID landscapeToken, long methodHash, String nodeI
                               String applicationName, String applicationLanguage,
                               int applicationInstance, String packageName, String className,
                               String methodName, long timeSeen) {
-  public static LandscapeRecord fromRow(Row row) {
-    UUID landscapeToken = row.getUuid("landscape_token");
-    long methodHash = row.getLong("method_hash");
-    String nodeIpAddress = row.getString("node_ip_address");
-    String applicationName = row.getString("application_name");
-    String applicationLanguage = row.getString("application_language");
-    int applicationInstance = row.getInt("application_instance");
-    String methodFqn = row.getString("method_fqn");
-    long timeSeen = row.getLong("time_seen");
+  public static LandscapeRecord fromRow(final Row row) {
+    final UUID landscapeToken = row.getUuid("landscape_token");
+    final long methodHash = row.getLong("method_hash");
+    final String nodeIpAddress = row.getString("node_ip_address");
+    final String applicationName = row.getString("application_name");
+    final String applicationLanguage = row.getString("application_language");
+    final int applicationInstance = row.getInt("application_instance");
+    final String methodFqn = row.getString("method_fqn");
+    final long timeSeen = row.getLong("time_seen");
 
     // TODO: Error handling
     /*

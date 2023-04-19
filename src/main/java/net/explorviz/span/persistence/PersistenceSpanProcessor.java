@@ -27,41 +27,45 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
 
   private final QuarkusCqlSession session;
 
-  private final PreparedStatement insertSpanByTime;
-  private final PreparedStatement insertSpanByTraceid;
-  private final PreparedStatement insertTraceByHash;
-  private final PreparedStatement insertTraceByTime;
-  private final PreparedStatement insertSpanStructure;
+  private final PreparedStatement insertSpanByTimeStatement;
+  private final PreparedStatement insertSpanByTraceidStatement;
+  private final PreparedStatement insertTraceByHashStatement;
+  private final PreparedStatement insertTraceByTimeStatement;
+  private final PreparedStatement insertSpanStructureStatement;
 
-  public PersistenceSpanProcessor(QuarkusCqlSession session) {
+  public PersistenceSpanProcessor(final QuarkusCqlSession session) {
     this.session = session;
 
-    this.insertSpanByTime = session.prepare("INSERT INTO span_by_time "
+    this.insertSpanByTimeStatement = session.prepare("INSERT INTO span_by_time "
         + "(landscape_token, start_time_s, start_time_ns, method_hash, span_id, trace_id) "
         + "VALUES (?, ?, ?, ?, ?, ?)");
-    this.insertSpanByTraceid = session.prepare("INSERT INTO span_by_traceid "
+    this.insertSpanByTraceidStatement = session.prepare("INSERT INTO span_by_traceid "
         + "(landscape_token, trace_id, span_id, parent_span_id, start_time, end_time, method_hash) "
         + "VALUES (?, ?, ?, ?, ?, ?, ?)");
-    this.insertTraceByHash = session.prepare(
+    this.insertTraceByHashStatement = session.prepare(
         "INSERT INTO trace_by_hash " + "(landscape_token, method_hash, time_bucket, trace_id) "
             + "VALUES (?, ?, ?, ?)");
-    this.insertTraceByTime = session.prepare(
+    this.insertTraceByTimeStatement = session.prepare(
         "INSERT INTO trace_by_time " + "(landscape_token, start_time_s, start_time_ns, trace_id) "
             + "VALUES (?, ?, ?, ?)");
-    this.insertSpanStructure = session.prepare("INSERT INTO span_structure "
+    this.insertSpanStructureStatement = session.prepare("INSERT INTO span_structure "
         + "(landscape_token, method_hash, node_ip_address, application_name, application_language, "
         + "application_instance, method_fqn, time_seen) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
         + "USING TIMESTAMP ?");
   }
 
   @Override
-  public void accept(PersistenceSpan span) {
-    Set<Long> knownHashes = knownHashesByLandscape.computeIfAbsent(span.landscapeToken(),
+  public void accept(final PersistenceSpan span) {
+    final Set<Long> knownHashes = knownHashesByLandscape.computeIfAbsent(span.landscapeToken(),
         uuid -> ConcurrentHashMap.newKeySet());
 
     if (knownHashes.add(span.methodHash())) {
-      LOGGER.debug("Inserting new structure with method_hash={}, method_fqn={}", span.methodHash(),
-          span.methodFqn());
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Inserting new structure with method_hash={}, method_fqn={}",
+            span.methodHash(), span.methodFqn());
+      }
+
       insertSpanStructure(span);
     }
 
@@ -77,16 +81,16 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     lastProcessedSpans.incrementAndGet();
   }
 
-  private void insertSpan(PersistenceSpan span) {
-    BoundStatement stmtByTime =
-        insertSpanByTime.bind(span.landscapeToken(), span.getStartTimeSeconds(),
+  private void insertSpan(final PersistenceSpan span) {
+    final BoundStatement stmtByTime =
+        insertSpanByTimeStatement.bind(span.landscapeToken(), span.getStartTimeSeconds(),
             span.getStartTimeNanos(), span.methodHash(), span.spanId(), span.traceId());
-    BoundStatement stmtByTraceid =
-        insertSpanByTraceid.bind(span.landscapeToken(), span.traceId(), span.spanId(),
+    final BoundStatement stmtByTraceid =
+        insertSpanByTraceidStatement.bind(span.landscapeToken(), span.traceId(), span.spanId(),
             span.parentSpanId(), span.startTime(), span.endTime(), span.methodHash());
-    BoundStatement stmtByHash =
-        insertTraceByHash.bind(span.landscapeToken(), span.methodHash(), span.getStartTimeBucket(),
-            span.traceId());
+    final BoundStatement stmtByHash =
+        insertTraceByHashStatement.bind(span.landscapeToken(), span.methodHash(),
+            span.getStartTimeBucket(), span.traceId());
 
     session.executeAsync(stmtByTime).exceptionally(failure -> {
       lastFailures.incrementAndGet();
@@ -105,9 +109,9 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     });
   }
 
-  private void insertTrace(PersistenceSpan span) {
-    BoundStatement stmtByTime =
-        insertTraceByTime.bind(span.landscapeToken(), span.getStartTimeSeconds(),
+  private void insertTrace(final PersistenceSpan span) {
+    final BoundStatement stmtByTime =
+        insertTraceByTimeStatement.bind(span.landscapeToken(), span.getStartTimeSeconds(),
             span.getStartTimeNanos(), span.traceId());
 
     session.executeAsync(stmtByTime).whenComplete((result, failure) -> {
@@ -120,23 +124,26 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     });
   }
 
-  private long computeStructureWriteTimestamp(PersistenceSpan span) {
+  private long computeStructureWriteTimestamp(final PersistenceSpan span) {
     return Integer.MAX_VALUE - span.getStartTimeSeconds(); // TODO
   }
 
-  private void insertSpanStructure(PersistenceSpan span) {
-    BoundStatement stmtStructure =
-        insertSpanStructure.bind(span.landscapeToken(), span.methodHash(), span.nodeIpAddress(),
-            span.applicationName(), span.applicationLanguage(), span.applicationInstance(),
-            span.methodFqn(), span.startTime(), computeStructureWriteTimestamp(span));
+  private void insertSpanStructure(final PersistenceSpan span) {
+    final BoundStatement stmtStructure =
+        insertSpanStructureStatement.bind(span.landscapeToken(), span.methodHash(),
+            span.nodeIpAddress(), span.applicationName(), span.applicationLanguage(),
+            span.applicationInstance(), span.methodFqn(), span.startTime(),
+            computeStructureWriteTimestamp(span));
 
     session.executeAsync(stmtStructure).whenComplete((result, failure) -> {
       if (failure == null) {
         lastSavesSpanStructures.incrementAndGet();
       } else {
         lastFailures.incrementAndGet();
-        LOGGER.error("Could not persist structure with hash {}, removing from cache",
-            span.methodFqn(), failure);
+        if (LOGGER.isErrorEnabled()) {
+          LOGGER.error("Could not persist structure with hash {}, removing from cache",
+              span.methodFqn(), failure);
+        }
         knownHashesByLandscape.get(span.landscapeToken()).remove(span.methodHash());
       }
     });
@@ -147,9 +154,10 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     final long processedSpans = this.lastProcessedSpans.getAndSet(0);
     final long savedTraces = this.lastSavedTraces.getAndSet(0);
     final long savesSpanStructures = this.lastSavesSpanStructures.getAndSet(0);
-    LOGGER.debug("Processed {} spans, inserted {} traces and {} span structures.", processedSpans,
-        savedTraces, savesSpanStructures);
-
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Processed {} spans, inserted {} traces and {} span structures.", processedSpans,
+          savedTraces, savesSpanStructures);
+    }
     final long failures = this.lastFailures.getAndSet(0);
     if (failures != 0) {
       LOGGER.warn("Data loss occured. {} inserts failed", failures);

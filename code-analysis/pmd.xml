@@ -11,6 +11,8 @@
   <exclude-pattern>.*/build/.*</exclude-pattern>
   <exclude-pattern>.*/src/test/.*</exclude-pattern>
   <exclude-pattern>.*/src/integrationTest/.*</exclude-pattern>
+  <exclude-pattern>.*/src/main/java/net/explorviz/span/hash/HighwayHash.java</exclude-pattern>
+
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorMethodGeneration" />

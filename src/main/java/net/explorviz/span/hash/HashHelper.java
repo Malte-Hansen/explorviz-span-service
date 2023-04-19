@@ -9,23 +9,24 @@ public final class HashHelper {
           0x7a_53_70_61_6e_73_48_69L, 0x67_68_77_61_79_48_61_73L, 0x68_43_6f_64_65_4b_65_79L};
 
   private HashHelper() {
+    // final class
   }
 
   public static long calculateSpanHash(final UUID landscapeToken, final String nodeIpAddress,
       final String applicationName, final int applicationInstance, final String methodFqn) {
-    HighwayHash hash = new HighwayHash(HIGHWAY_HASH_KEY);
+    final HighwayHash hash = new HighwayHash(HIGHWAY_HASH_KEY);
 
     // TODO: Fill with IPv6 address bits (Convert IPv4 to IPv4-in-IPv6 representation)
     hash.update(landscapeToken.getMostSignificantBits(), landscapeToken.getLeastSignificantBits(),
         applicationInstance, 0L);
 
-    String builder = applicationName + ';' + nodeIpAddress + ';' + methodFqn;
-    byte[] bytes = builder.getBytes(StandardCharsets.UTF_8);
+    final String builder = applicationName + ';' + nodeIpAddress + ';' + methodFqn;
+    final byte[] bytes = builder.getBytes(StandardCharsets.UTF_8);
     int position = 0;
     for (; bytes.length - position >= 32; position += 32) {
       hash.updatePacket(bytes, position);
     }
-    int remaining = bytes.length - position;
+    final int remaining = bytes.length - position;
     if (remaining > 0) {
       hash.updateRemainder(bytes, position, remaining);
     }

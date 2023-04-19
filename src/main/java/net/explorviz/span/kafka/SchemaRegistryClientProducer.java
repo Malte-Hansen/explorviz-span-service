@@ -14,7 +14,7 @@ public class SchemaRegistryClientProducer {
   private static final int MAX_NUM_OF_SCHEMAS = 10;
 
   @ConfigProperty(name = "quarkus.kafka-streams.schema-registry-url")
-  String schemaRegistryUrl;
+  /* default */ String schemaRegistryUrl;
 
   @Produces
   @DefaultBean
