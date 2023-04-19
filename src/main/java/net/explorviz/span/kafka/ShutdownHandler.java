@@ -3,11 +3,9 @@ package net.explorviz.span.kafka;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KafkaStreams.State;
 import org.apache.kafka.streams.KafkaStreams.StateListener;
@@ -22,31 +20,32 @@ import org.slf4j.LoggerFactory;
  */
 @ApplicationScoped
 public class ShutdownHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHandler.class);
 
-    @Inject
-    KafkaStreams streams;
+  @Inject
+  /* default */ KafkaStreams streams;
 
-    void onStart(@Observes final StartupEvent ev) {
-        this.streams.setStateListener(new ErrorStateListener());
+  /* default */ void onStart(@Observes final StartupEvent ev) {
+    this.streams.setStateListener(new ErrorStateListener());
+  }
+
+  /* default */ void onStop(@Observes final ShutdownEvent ev) {
+    // nothing to do
+  }
+
+  private static class ErrorStateListener implements StateListener {
+    @Override
+    public void onChange(final State newState, final State oldState) {
+      if (newState == State.ERROR) {
+        LOGGER.error("Kafka Streams thread died. "
+            + "Are Kafka topic initialized? Quarkus application will shut down.");
+
+        LOGGER.error("About to system exit due to Kafka Streams Error.");
+        Quarkus.asyncExit(-1);
+        Quarkus.waitForExit();
+        System.exit(-1); // NOPMD
+      }
+
     }
-
-    void onStop(@Observes final ShutdownEvent ev) {
-    }
-
-    private static class ErrorStateListener implements StateListener {
-        @Override
-        public void onChange(final State newState, final State oldState) {
-            if (newState == State.ERROR) {
-                LOGGER.error("Kafka Streams thread died. "
-                                 + "Are Kafka topic initialized? Quarkus application will shut down.");
-
-                LOGGER.error("About to system exit due to Kafka Streams Error.");
-                Quarkus.asyncExit(-1);
-                Quarkus.waitForExit();
-                System.exit(-1); // NOPMD
-            }
-
-        }
-    }
+  }
 }
