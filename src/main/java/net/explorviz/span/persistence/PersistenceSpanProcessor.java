@@ -46,7 +46,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
                 + "(landscape_token, trace_id, span_id, parent_span_id, start_time, end_time, method_hash) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)");
         this.insertTraceByHashcode = session.prepare(
-            "INSERT INTO trace_by_hashcode "
+            "INSERT INTO trace_by_hash "
                 + "(landscape_token, method_hash, time_bucket, trace_id) "
                 + "VALUES (?, ?, ?, ?)");
         this.insertTraceByTime = session.prepare(
