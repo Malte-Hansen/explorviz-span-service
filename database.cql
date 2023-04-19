@@ -1,3 +1,7 @@
+/*
+@formatter:off
+ */
+
 CREATE KEYSPACE IF NOT EXISTS explorviz WITH replication = {'class':'SimpleStrategy', 'replication_factor':1};
 
 // Find spans in a specific time range (used to find aggregate call counts)
