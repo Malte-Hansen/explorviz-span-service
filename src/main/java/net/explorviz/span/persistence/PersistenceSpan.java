@@ -9,12 +9,12 @@ public record PersistenceSpan(
     long traceId,
     long startTime,
     long endTime,
-    String hostIpAddress, // TODO: Convert into InetAddress type?
-    String appName,
-    int appInstanceId,
-    String appLanguage,
+    String nodeIpAddress, // TODO: Convert into InetAddress type?
+    String applicationName,
+    String applicationLanguage,
+    int applicationInstance,
     String methodFqn,
-    long methodHashCode
+    long methodHash
 ) {
     public static final long NANOS_PER_SEC = 1_000_000_000L;
 

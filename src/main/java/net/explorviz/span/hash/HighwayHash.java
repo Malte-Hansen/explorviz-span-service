@@ -1,8 +1,10 @@
-package net.explorviz.span.service.converter;
+package net.explorviz.span.hash;
 
 /**
  * HighwayHash algorithm. See <a href="https://github.com/google/highwayhash">
- * HighwayHash on GitHub</a>
+ * HighwayHash on GitHub</a>.
+ * <p>
+ * Originally licensed under Apache License version 2.0.
  */
 public final class HighwayHash {
     private final long[] v0 = new long[4];
@@ -34,8 +36,9 @@ public final class HighwayHash {
     /**
      * Updates the hash with 32 bytes of data. If you can read 4 long values
      * from your data efficiently, prefer using update() instead for more speed.
+     *
      * @param packet data array which has a length of at least pos + 32
-     * @param pos position in the array to read the first of 32 bytes from
+     * @param pos    position in the array to read the first of 32 bytes from
      */
     public void updatePacket(byte[] packet, int pos) {
         if (pos < 0) {
@@ -54,6 +57,7 @@ public final class HighwayHash {
     /**
      * Updates the hash with 32 bytes of data given as 4 longs. This function is
      * more efficient than updatePacket when you can use it.
+     *
      * @param a0 first 8 bytes in little endian 64-bit long
      * @param a1 next 8 bytes in little endian 64-bit long
      * @param a2 next 8 bytes in little endian 64-bit long
@@ -88,8 +92,9 @@ public final class HighwayHash {
      * updatePacket first per 32 bytes of the data, if and only if 1 to 31 bytes
      * of the data are not processed after that, updateRemainder must be used for
      * those final bytes.
-     * @param bytes data array which has a length of at least pos + size_mod32
-     * @param pos position in the array to start reading size_mod32 bytes from
+     *
+     * @param bytes      data array which has a length of at least pos + size_mod32
+     * @param pos        position in the array to start reading size_mod32 bytes from
      * @param size_mod32 the amount of bytes to read
      */
     public void updateRemainder(byte[] bytes, int pos, int size_mod32) {
@@ -107,7 +112,7 @@ public final class HighwayHash {
         int remainder = size_mod32 & ~3;
         byte[] packet = new byte[32];
         for (int i = 0; i < 4; ++i) {
-            v0[i] += ((long)size_mod32 << 32) + size_mod32;
+            v0[i] += ((long) size_mod32 << 32) + size_mod32;
         }
         rotate32By(size_mod32, v1);
         for (int i = 0; i < remainder; i++) {
@@ -130,7 +135,7 @@ public final class HighwayHash {
     /**
      * Computes the hash value after all bytes were processed. Invalidates the
      * state.
-     *
+     * <p>
      * NOTE: The 64-bit HighwayHash algorithm is declared stable and no longer subject to change.
      *
      * @return 64-bit hash
@@ -147,7 +152,7 @@ public final class HighwayHash {
     /**
      * Computes the hash value after all bytes were processed. Invalidates the
      * state.
-     *
+     * <p>
      * NOTE: The 128-bit HighwayHash algorithm is not yet frozen and subject to change.
      *
      * @return array of size 2 containing 128-bit hash
@@ -169,7 +174,7 @@ public final class HighwayHash {
     /**
      * Computes the hash value after all bytes were processed. Invalidates the
      * state.
-     *
+     * <p>
      * NOTE: The 256-bit HighwayHash algorithm is not yet frozen and subject to change.
      *
      * @return array of size 4 containing 256-bit hash
@@ -195,6 +200,7 @@ public final class HighwayHash {
             hash, 2);
         return hash;
     }
+
     private void reset(long key0, long key1, long key2, long key3) {
         mul0[0] = 0xdbe6d5d5fe4cce2fL;
         mul0[1] = 0xa4093822299f31d0L;
@@ -240,9 +246,9 @@ public final class HighwayHash {
         for (int i = 0; i < 4; ++i) {
             long half0 = (lanes[i] & 0xffffffffL);
             long half1 = (lanes[i] >>> 32) & 0xffffffffL;
-            lanes[i] = ((half0 << count)  & 0xffffffffL) | (half0 >>> (32 - count));
-            lanes[i] |= ((long)(((half1 << count) & 0xffffffffL) |
-                                    (half1 >>> (32 - count)))) << 32;
+            lanes[i] = ((half0 << count) & 0xffffffffL) | (half0 >>> (32 - count));
+            lanes[i] |= ((long) (((half1 << count) & 0xffffffffL) |
+                                     (half1 >>> (32 - count)))) << 32;
         }
     }
 
@@ -265,10 +271,10 @@ public final class HighwayHash {
     /**
      * NOTE: The 64-bit HighwayHash algorithm is declared stable and no longer subject to change.
      *
-     * @param data array with data bytes
+     * @param data   array with data bytes
      * @param offset position of first byte of data to read from
      * @param length number of bytes from data to read
-     * @param key array of size 4 with the key to initialize the hash with
+     * @param key    array of size 4 with the key to initialize the hash with
      * @return 64-bit hash for the given data
      */
     public static long hash64(byte[] data, int offset, int length, long[] key) {

@@ -1,5 +1,5 @@
 @namespace("net.explorviz.avro")
-protocol TraceEventProtocol {
+protocol ExplorvizProtocol {
     enum EventType {
         CREATED,
         DELETED,
@@ -36,16 +36,5 @@ protocol TraceEventProtocol {
         string appInstanceId;
         string appLanguage;
         string hashCode = "default-hashcode";
-    }
-
-    record Trace {
-        string landscapeToken;
-        string traceId;
-        long startTimeEpochMilli;
-        long endTimeEpochMilli;
-        long duration;
-        int overallRequestCount = 1;
-        int traceCount = 1;
-        array<Span> spanList;
     }
 }

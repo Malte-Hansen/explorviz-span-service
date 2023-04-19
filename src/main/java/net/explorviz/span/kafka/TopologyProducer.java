@@ -3,8 +3,8 @@ package net.explorviz.span.kafka;
 import io.quarkus.scheduler.Scheduled;
 import net.explorviz.avro.Span;
 import net.explorviz.span.persistence.PersistenceSpan;
-import net.explorviz.span.service.converter.SpanConverter;
-import net.explorviz.span.service.processor.PersistenceSpanProcessor;
+import net.explorviz.span.persistence.SpanConverter;
+import net.explorviz.span.persistence.PersistenceSpanProcessor;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -65,7 +65,7 @@ public class TopologyProducer {
 
         if (LOGGER.isTraceEnabled()) {
             persistenceStream.foreach((token, span) -> LOGGER.trace("Span {} has hash code {}: {}",
-                Long.toHexString(span.spanId()), Long.toHexString(span.methodHashCode()), span.methodFqn()));
+                Long.toHexString(span.spanId()), Long.toHexString(span.methodHash()), span.methodFqn()));
         }
 
         persistenceStream.foreach((token, span) -> persistenceProcessor.accept(span));

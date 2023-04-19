@@ -1,4 +1,4 @@
-package net.explorviz.span.service.converter;
+package net.explorviz.span.hash;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -10,15 +10,17 @@ public final class HashHelper {
     private HashHelper() {
     }
 
-    // TODO: Should probably have all fields contained in span structure table?
-    public static long calculateSpanHash(final UUID landscapeToken, final String hostIpAddress,
-                                         final String appName, final int appInstanceId, final String methodFqn) {
+    public static long calculateSpanHash(final UUID landscapeToken, final String nodeIpAddress,
+                                         final String applicationName, final int applicationInstance,
+                                         final String methodFqn) {
         HighwayHash hash = new HighwayHash(HIGHWAY_HASH_KEY);
 
         // TODO: Fill with IPv6 address bits (Convert IPv4 to IPv4-in-IPv6 representation)
-        hash.update(landscapeToken.getMostSignificantBits(), landscapeToken.getLeastSignificantBits(), appInstanceId, 0L);
+        hash.update(
+            landscapeToken.getMostSignificantBits(), landscapeToken.getLeastSignificantBits(), applicationInstance, 0L
+        );
 
-        String builder = appName + ';' + hostIpAddress + ';' + methodFqn;
+        String builder = applicationName + ';' + nodeIpAddress + ';' + methodFqn;
         byte[] bytes = builder.getBytes(StandardCharsets.UTF_8);
         int position = 0;
         for (; bytes.length - position >= 32; position += 32) {

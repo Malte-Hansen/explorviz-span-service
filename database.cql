@@ -6,13 +6,13 @@ CREATE TABLE explorviz.span_by_time
     landscape_token uuid,
     start_time_s    int,
     start_time_ns   int,
-    hash_code       bigint,
+    method_hash     bigint,
     span_id         bigint,
     trace_id        bigint, // to be able to select full trace from span_by_traceid?
-    PRIMARY KEY ((landscape_token, start_time_s), start_time_ns, hash_code, span_id)
+    PRIMARY KEY ((landscape_token, start_time_s), start_time_ns, method_hash, span_id)
 );
 
-// SELECT trace_idFROM traceid_by_time WHERE landscape_token = X AND start_time_s = X;
+// SELECT trace_id FROM traceid_by_time WHERE landscape_token = X AND start_time_s = X;
 
 // Get complete traces by their trace id
 CREATE TABLE explorviz.span_by_traceid
@@ -23,21 +23,21 @@ CREATE TABLE explorviz.span_by_traceid
     parent_span_id  bigint,
     start_time      bigint,
     end_time        bigint,
-    hash_code       bigint,
+    method_hash     bigint,
     PRIMARY KEY ((landscape_token, trace_id), span_id) // parent_span_id as first clustering key to find parent=0 quickly?
 );
 
-// Find traces that contain a span with a certain hashcode
-CREATE TABLE explorviz.trace_by_hashcode
+// Find traces that contain a span with a certain method_hash
+CREATE TABLE explorviz.trace_by_hash
 (
     landscape_token uuid,
-    hash_code       bigint,
+    method_hash     bigint,
     time_bucket     int,
     trace_id        bigint,
-    PRIMARY KEY ((landscape_token, hash_code, time_bucket), trace_id)
+    PRIMARY KEY ((landscape_token, method_hash, time_bucket), trace_id)
 );
 
-//SELECT trace_id FROM traceid_by_hashcode WHERE landscape_token = X AND hash_code = X AND time_bucket = TODAY();
+//SELECT trace_id FROM trace_by_hash WHERE landscape_token = X AND method_hash = X AND time_bucket = TODAY();
 
 // Find traces by time
 CREATE TABLE explorviz.trace_by_time
@@ -51,16 +51,16 @@ CREATE TABLE explorviz.trace_by_time
 
 //SELECT * FROM span_by_traceid WHERE landscape_token = X AND trace_id IN (previous result);
 
-// Map hashcode to metadata
+// Map method_hash to metadata
 CREATE TABLE explorviz.span_structure
 (
     landscape_token      uuid,
-    hash_code            bigint,
-    host_ip_address      text,
+    method_hash          bigint,
+    node_ip_address      text,
     application_name     text,
     application_language text,
-    instance_id          int,
+    application_instance int,
     method_fqn           text,
-    // TODO: time field so we can ask "span structure up to time X"
-    PRIMARY KEY ((landscape_token), hash_code)
+    time_seen            bigint,
+    PRIMARY KEY ((landscape_token), method_hash)
 );
