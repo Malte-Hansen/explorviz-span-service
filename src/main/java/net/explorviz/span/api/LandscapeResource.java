@@ -10,12 +10,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import net.explorviz.span.landscape.Landscape;
 import net.explorviz.span.landscape.assembler.LandscapeAssembler;
 import net.explorviz.span.landscape.assembler.LandscapeAssemblyException;
 import net.explorviz.span.landscape.assembler.impl.NoRecordsException;
 import net.explorviz.span.landscape.loader.LandscapeLoader;
+import net.explorviz.span.landscape.loader.LandscapeRecord;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -47,8 +49,16 @@ public class LandscapeResource {
             token = "7cd8a9a7-b840-4735-9ef0-2dbbfa01c039"; // TODO: Remove invalid token hotfix
         }
 
-        // TODO: from, to
-        return loader.loadLandscape(UUID.fromString(token)).collect().asList()
+        Multi<LandscapeRecord> recordMulti;
+        // TODO: Determine if we should allow from/to alone
+        if (from == null || to == null) {
+            // TODO: Cache (shared with PersistenceSpanProcessor?)
+            recordMulti = loader.loadLandscape(UUID.fromString(token));
+        } else {
+            recordMulti = loader.loadLandscape(UUID.fromString(token), from, to);
+        }
+
+        return recordMulti.collect().asList()
                    .map(assembler::assembleFromRecords)
                    .onFailure(NoRecordsException.class)
                    .transform(t -> new NotFoundException("Landscape not found or empty", t))
