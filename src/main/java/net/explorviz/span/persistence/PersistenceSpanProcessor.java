@@ -65,7 +65,8 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
       insertSpanStructure(span);
     }
 
-    // TODO: We should probably only insert spans after corresponding span_structure has been inserted
+    // TODO: We should probably only insert spans
+    //  after corresponding span_structure has been inserted
 
     if (span.parentSpanId() == 0) {
       insertTrace(span);

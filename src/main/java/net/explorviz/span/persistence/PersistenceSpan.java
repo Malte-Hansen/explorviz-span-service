@@ -13,7 +13,8 @@ public record PersistenceSpan(UUID landscapeToken, long spanId, long parentSpanI
     return getStartTimeSeconds(); // TODO: Define time bucket
   }
 
-  // TODO: These need to be tested! :S Potentially optimize divideUnsigned call out. Consider negative longs may be valid
+  // TODO: These need to be tested! :S Potentially optimize divideUnsigned call out.
+  //  Consider negative longs may be valid
 
   /**
    * Timestamps in 32bit signed ints are no good since Year2038 is so close. We buy some time by

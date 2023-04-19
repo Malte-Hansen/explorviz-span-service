@@ -62,7 +62,7 @@ public final class HighwayHash {
     if (pos + 32 > packet.length) {
       throw new IllegalArgumentException("packet must have at least 32 bytes after pos");
     }
-    long a0 = read64(packet, pos);
+    long a0 = read64(packet, pos + 0);
     long a1 = read64(packet, pos + 8);
     long a2 = read64(packet, pos + 16);
     long a3 = read64(packet, pos + 24);
@@ -128,14 +128,16 @@ public final class HighwayHash {
       v0[i] += ((long) size_mod32 << 32) + size_mod32;
     }
     rotate32By(size_mod32, v1);
-    System.arraycopy(bytes, pos + 0, packet, 0, remainder);
+    for (int i = 0; i < remainder; i++) {
+      packet[i] = bytes[pos + i];
+    }
     if ((size_mod32 & 16) != 0) {
       for (int i = 0; i < 4; i++) {
         packet[28 + i] = bytes[pos + remainder + i + size_mod4 - 4];
       }
     } else {
       if (size_mod4 != 0) {
-        packet[16] = bytes[pos + remainder];
+        packet[16 + 0] = bytes[pos + remainder + 0];
         packet[16 + 1] = bytes[pos + remainder + (size_mod4 >>> 1)];
         packet[16 + 2] = bytes[pos + remainder + (size_mod4 - 1)];
       }
@@ -238,7 +240,7 @@ public final class HighwayHash {
 
   private long read64(byte[] src, int pos) {
     // Mask with 0xffL so that it is 0..255 as long (byte can only be -128..127)
-    return (src[pos] & 0xffL) | ((src[pos + 1] & 0xffL) << 8) | ((src[pos + 2] & 0xffL) << 16)
+    return (src[pos + 0] & 0xffL) | ((src[pos + 1] & 0xffL) << 8) | ((src[pos + 2] & 0xffL) << 16)
         | ((src[pos + 3] & 0xffL) << 24) | ((src[pos + 4] & 0xffL) << 32) | ((src[pos + 5] & 0xffL)
         << 40) | ((src[pos + 6] & 0xffL) << 48) | ((src[pos + 7] & 0xffL) << 56);
   }
@@ -248,7 +250,7 @@ public final class HighwayHash {
       long half0 = (lanes[i] & 0xffffffffL);
       long half1 = (lanes[i] >>> 32) & 0xffffffffL;
       lanes[i] = ((half0 << count) & 0xffffffffL) | (half0 >>> (32 - count));
-      lanes[i] |= (((half1 << count) & 0xffffffffL) | (half1 >>> (32 - count))) << 32;
+      lanes[i] |= ((long) (((half1 << count) & 0xffffffffL) | (half1 >>> (32 - count)))) << 32;
     }
   }
 
@@ -262,7 +264,7 @@ public final class HighwayHash {
   private void modularReduction(long a3_unmasked, long a2, long a1, long a0, long[] hash, int pos) {
     long a3 = a3_unmasked & 0x3FFFFFFFFFFFFFFFL;
     hash[pos + 1] = a1 ^ ((a3 << 1) | (a2 >>> 63)) ^ ((a3 << 2) | (a2 >>> 62));
-    hash[pos] = a0 ^ (a2 << 1) ^ (a2 << 2);
+    hash[pos + 0] = a0 ^ (a2 << 1) ^ (a2 << 2);
   }
 
   private void processAll(byte[] data, int offset, int length) {
