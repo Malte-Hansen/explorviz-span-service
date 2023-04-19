@@ -30,7 +30,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
 
     private final PreparedStatement insertSpanByTime;
     private final PreparedStatement insertSpanByTraceid;
-    private final PreparedStatement insertTraceByHashcode;
+    private final PreparedStatement insertTraceByHash;
     private final PreparedStatement insertTraceByTime;
     private final PreparedStatement insertSpanStructure;
 
@@ -45,7 +45,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
             "INSERT INTO span_by_traceid "
                 + "(landscape_token, trace_id, span_id, parent_span_id, start_time, end_time, method_hash) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)");
-        this.insertTraceByHashcode = session.prepare(
+        this.insertTraceByHash = session.prepare(
             "INSERT INTO trace_by_hash "
                 + "(landscape_token, method_hash, time_bucket, trace_id) "
                 + "VALUES (?, ?, ?, ?)");
@@ -92,7 +92,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
             span.landscapeToken(), span.traceId(), span.spanId(), span.parentSpanId(), span.startTime(), span.endTime(),
             span.methodHash()
         );
-        BoundStatement stmtByHashcode = insertTraceByHashcode.bind(
+        BoundStatement stmtByHash = insertTraceByHash.bind(
             span.landscapeToken(), span.methodHash(), span.getStartTimeBucket(), span.traceId()
         );
 
@@ -106,7 +106,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
             //LOGGER.error("Could not persist span by traceid", failure);
             return null;
         });
-        session.executeAsync(stmtByHashcode).exceptionally(failure -> {
+        session.executeAsync(stmtByHash).exceptionally(failure -> {
             lastFailures.incrementAndGet();
             //LOGGER.error("Could not persist trace by hashcode", failure);
             return null;
