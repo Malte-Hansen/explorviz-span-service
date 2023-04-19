@@ -107,7 +107,7 @@ public final class PackageHelper {
      */
     public static Package fromPath(final Application app, final String[] path) {
         if (path == null || path.length == 0) {
-            throw new LandscapeAssemblyException("Path must a least contain a root");
+            throw new LandscapeAssemblyException("Path must at least contain a root");
         }
         final LandscapeAssemblyException noSuchPathException =
             new LandscapeAssemblyException("No such path in given application");

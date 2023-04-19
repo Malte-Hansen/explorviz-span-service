@@ -2,6 +2,8 @@ package net.explorviz.span.api;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -11,6 +13,8 @@ import javax.ws.rs.core.MediaType;
 import io.smallrye.mutiny.Uni;
 import net.explorviz.span.landscape.Landscape;
 import net.explorviz.span.landscape.assembler.LandscapeAssembler;
+import net.explorviz.span.landscape.assembler.LandscapeAssemblyException;
+import net.explorviz.span.landscape.assembler.impl.NoRecordsException;
 import net.explorviz.span.landscape.loader.LandscapeLoader;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
@@ -44,6 +48,11 @@ public class LandscapeResource {
         }
 
         // TODO: from, to
-        return loader.loadLandscape(UUID.fromString(token)).collect().asList().map(assembler::assembleFromRecords);
+        return loader.loadLandscape(UUID.fromString(token)).collect().asList()
+                   .map(assembler::assembleFromRecords)
+                   .onFailure(NoRecordsException.class)
+                   .transform(t -> new NotFoundException("Landscape not found or empty", t))
+                   .onFailure(LandscapeAssemblyException.class)
+                   .transform(t -> new InternalServerErrorException("Landscape assembly error: " + t.getMessage(), t));
     }
 }
