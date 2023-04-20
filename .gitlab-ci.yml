@@ -61,6 +61,8 @@ push-dockerhub-native:
     - exec-docker
   script:
     - ./gradlew clean assemble -Dquarkus.package.type=native -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.name=span-service-native -Dquarkus.container-image.additional-tags=$CI_COMMIT_SHORT_SHA -Dquarkus.native.additional-build-args="--initialize-at-run-time=org.apache.kafka.common.security.authenticator.SaslClientAuthenticator\\,org.apache.kafka.common.security.oauthbearer.internals.expiring.ExpiringCredentialRefreshingLogin" -Dquarkus.container-image.username=$EXPLORVIZ_DOCKERHUB_USERNAME -Dquarkus.container-image.password=$EXPLORVIZ_DOCKERHUB_PASSWORD
+  after_script:
+    - echo "Image was uploaded to Dockerhub; explorviz/span-service-native:latest and explorviz/span-service-native:$CI_COMMIT_SHORT_SHA"
 
 .push-dockerhub-base-job:
   stage: publish
@@ -70,6 +72,8 @@ push-dockerhub-native:
     - exec-docker
   script:
     - ./gradlew clean assemble -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.additional-tags=$CI_COMMIT_SHORT_SHA -Dquarkus.container-image.username=$EXPLORVIZ_DOCKERHUB_USERNAME -Dquarkus.container-image.password=$EXPLORVIZ_DOCKERHUB_PASSWORD
+  after_script:
+    - echo "Image was uploaded to Dockerhub; explorviz/span-service-jvm:latest and explorviz/span-service-jvm:$CI_COMMIT_SHORT_SHA"
 
 push-dockerhub-main:
   extends: .push-dockerhub-base-job
@@ -80,3 +84,5 @@ push-dockerhub-mr:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
     - ./gradlew clean assemble -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.tag=$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA -Dquarkus.container-image.username=$EXPLORVIZ_DOCKERHUB_USERNAME -Dquarkus.container-image.password=$EXPLORVIZ_DOCKERHUB_PASSWORD
+  after_script:
+    - echo "Image was uploaded to Dockerhub; explorviz/span-service-jvm:$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA"
