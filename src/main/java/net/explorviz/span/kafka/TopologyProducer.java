@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class TopologyProducer {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(TopologyProducer.class);
+
   private final AtomicInteger lastReceivedSpans = new AtomicInteger(0);
 
   @ConfigProperty(name = "explorviz.kafka-streams.topics.in")

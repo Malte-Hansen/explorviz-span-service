@@ -5,10 +5,18 @@ import java.util.Arrays;
 import java.util.UUID;
 
 // TODO: Unify PersistenceSpan and LandscapeRecord? (move FQN parsing into assembler?)
-public record LandscapeRecord(UUID landscapeToken, long methodHash, String nodeIpAddress,
-                              String applicationName, String applicationLanguage,
-                              int applicationInstance, String packageName, String className,
-                              String methodName, long timeSeen) {
+public record LandscapeRecord(
+    UUID landscapeToken,
+    long methodHash,
+    String nodeIpAddress,
+    String applicationName,
+    String applicationLanguage,
+    int applicationInstance,
+    String packageName,
+    String className,
+    String methodName,
+    long timeSeen
+) {
   public static LandscapeRecord fromRow(final Row row) {
     final UUID landscapeToken = row.getUuid("landscape_token");
     final long methodHash = row.getLong("method_hash");
