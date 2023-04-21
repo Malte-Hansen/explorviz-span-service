@@ -56,11 +56,12 @@ public class LandscapeResource {
       recordMulti = loader.loadLandscape(UUID.fromString(token), from, to);
     }
 
-    return recordMulti.collect().asList().map(assembler::assembleFromRecords)
+    return recordMulti.collect().asList()
+        .map(assembler::assembleFromRecords)
         .onFailure(NoRecordsException.class)
         .transform(t -> new NotFoundException("Landscape not found or empty", t))
-        .onFailure(LandscapeAssemblyException.class).transform(
-            t -> new InternalServerErrorException("Landscape assembly error: " + t.getMessage(),
-                t));
+        .onFailure(LandscapeAssemblyException.class)
+        .transform(t ->
+            new InternalServerErrorException("Landscape assembly error: " + t.getMessage(), t));
   }
 }

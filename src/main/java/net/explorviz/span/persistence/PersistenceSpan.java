@@ -2,11 +2,20 @@ package net.explorviz.span.persistence;
 
 import java.util.UUID;
 
-public record PersistenceSpan(UUID landscapeToken, long spanId, long parentSpanId, long traceId,
-                              long startTime, long endTime, String nodeIpAddress,
-                              // TODO: Convert into InetAddress type?
-                              String applicationName, String applicationLanguage,
-                              int applicationInstance, String methodFqn, long methodHash) {
+public record PersistenceSpan(
+    UUID landscapeToken,
+    long spanId,
+    long parentSpanId,
+    long traceId,
+    long startTime,
+    long endTime,
+    String nodeIpAddress, // TODO: Convert into InetAddress type?
+    String applicationName,
+    String applicationLanguage,
+    int applicationInstance,
+    String methodFqn,
+    long methodHash
+) {
   public static final long NANOS_PER_SEC = 1_000_000_000L;
 
   public int getStartTimeBucket() {

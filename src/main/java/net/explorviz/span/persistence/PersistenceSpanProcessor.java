@@ -42,15 +42,16 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     this.insertSpanByTraceidStatement = session.prepare("INSERT INTO span_by_traceid "
         + "(landscape_token, trace_id, span_id, parent_span_id, start_time, end_time, method_hash) "
         + "VALUES (?, ?, ?, ?, ?, ?, ?)");
-    this.insertTraceByHashStatement = session.prepare(
-        "INSERT INTO trace_by_hash " + "(landscape_token, method_hash, time_bucket, trace_id) "
-            + "VALUES (?, ?, ?, ?)");
-    this.insertTraceByTimeStatement = session.prepare(
-        "INSERT INTO trace_by_time " + "(landscape_token, start_time_s, start_time_ns, trace_id) "
-            + "VALUES (?, ?, ?, ?)");
+    this.insertTraceByHashStatement = session.prepare("INSERT INTO trace_by_hash "
+        + "(landscape_token, method_hash, time_bucket, trace_id) "
+        + "VALUES (?, ?, ?, ?)");
+    this.insertTraceByTimeStatement = session.prepare("INSERT INTO trace_by_time "
+        + "(landscape_token, start_time_s, start_time_ns, trace_id) "
+        + "VALUES (?, ?, ?, ?)");
     this.insertSpanStructureStatement = session.prepare("INSERT INTO span_structure "
         + "(landscape_token, method_hash, node_ip_address, application_name, application_language, "
-        + "application_instance, method_fqn, time_seen) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+        + "application_instance, method_fqn, time_seen) "
+        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
         + "USING TIMESTAMP ?");
   }
 
@@ -154,10 +155,8 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     final long processedSpans = this.lastProcessedSpans.getAndSet(0);
     final long savedTraces = this.lastSavedTraces.getAndSet(0);
     final long savesSpanStructures = this.lastSavesSpanStructures.getAndSet(0);
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Processed {} spans, inserted {} traces and {} span structures.", processedSpans,
-          savedTraces, savesSpanStructures);
-    }
+    LOGGER.debug("Processed {} spans, inserted {} traces and {} span structures.", processedSpans,
+        savedTraces, savesSpanStructures);
     final long failures = this.lastFailures.getAndSet(0);
     if (failures != 0) {
       LOGGER.warn("Data loss occured. {} inserts failed", failures);

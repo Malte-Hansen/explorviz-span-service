@@ -26,11 +26,15 @@ public class LandscapeLoader {
   public LandscapeLoader(final QuarkusCqlSession session) {
     this.session = session;
 
-    this.selectSpanStructure =
-        session.prepare("SELECT * " + "FROM span_structure " + "WHERE landscape_token = ?");
-    this.selectSpanStructureByTime = session.prepare(
-        "SELECT * " + "FROM span_structure " + "WHERE landscape_token = ? " + "AND time_seen >= ? "
-            + "AND time_seen <= ? " + "ALLOW FILTERING");
+    this.selectSpanStructure = session.prepare("SELECT * "
+        + "FROM span_structure "
+        + "WHERE landscape_token = ?");
+    this.selectSpanStructureByTime = session.prepare("SELECT * "
+        + "FROM span_structure "
+        + "WHERE landscape_token = ? "
+        + "AND time_seen >= ? "
+        + "AND time_seen <= ? "
+        + "ALLOW FILTERING");
   }
 
   public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken) {
@@ -52,8 +56,9 @@ public class LandscapeLoader {
   private Multi<LandscapeRecord> executeQuery(final BoundStatement stmtSelect) {
     lastRequestedLandscapes.incrementAndGet();
 
-    return session.executeReactive(stmtSelect).map(LandscapeRecord::fromRow).onItem()
-        .invoke(lastLoadedStructures::incrementAndGet);
+    return session.executeReactive(stmtSelect)
+        .map(LandscapeRecord::fromRow)
+        .onItem().invoke(lastLoadedStructures::incrementAndGet);
   }
 
   @Scheduled(every = "{explorviz.log.span.interval}")
