@@ -12,11 +12,11 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
   @Override
   public PersistenceSpan apply(final Span span) {
     String landscapeTokenRaw = span.getLandscapeToken();
-    if ("mytokenvalue".equals(landscapeTokenRaw)) {
-      landscapeTokenRaw =
-          "7cd8a9a7-b840-4735-9ef0-2dbbfa01c039"; // TODO: Remove invalid UUID hotfix
+    // TODO: Remove invalid UUID hotfix
+    UUID landscapeToken = PersistenceSpan.DEFAULT_UUID;
+    if (!"mytokenvalue".equals(landscapeTokenRaw)) {
+      landscapeToken = UUID.fromString(landscapeTokenRaw);
     }
-    final UUID landscapeToken = UUID.fromString(landscapeTokenRaw);
 
     final long spanId = Long.parseUnsignedLong(span.getSpanId(), 16);
 

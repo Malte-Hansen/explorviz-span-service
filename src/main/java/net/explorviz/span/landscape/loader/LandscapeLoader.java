@@ -38,18 +38,23 @@ public class LandscapeLoader {
   }
 
   public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken) {
-    LOGGER.debug("Loading landscape {}", landscapeToken);
+    LOGGER.debug("Loading landscape {} structure", landscapeToken);
 
-    final BoundStatement stmtSelect = selectSpanStructure.bind(landscapeToken);
+    final BoundStatement stmtSelect = selectSpanStructure.bind(
+        landscapeToken
+    );
     return executeQuery(stmtSelect);
   }
 
   public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken, final long from,
       final long to) {
-    LOGGER.debug("Loading landscape {} in time range {}-{}", landscapeToken, from, to);
+    LOGGER.debug("Loading landscape {} structure in time range {}-{}", landscapeToken, from, to);
 
-    final BoundStatement stmtSelectByTime =
-        selectSpanStructureByTime.bind(landscapeToken, from, to);
+    final BoundStatement stmtSelectByTime = selectSpanStructureByTime.bind(
+        landscapeToken,
+        from,
+        to
+    );
     return executeQuery(stmtSelectByTime);
   }
 
