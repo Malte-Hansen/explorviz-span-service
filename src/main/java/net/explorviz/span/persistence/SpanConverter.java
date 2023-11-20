@@ -5,9 +5,12 @@ import javax.enterprise.context.ApplicationScoped;
 import net.explorviz.avro.Span;
 import net.explorviz.span.hash.HashHelper;
 import org.apache.kafka.streams.kstream.ValueMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SpanConverter.class);
 
   @Override
   public PersistenceSpan apply(final Span span) {
@@ -19,6 +22,8 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
     }
 
     final long spanId = Long.parseUnsignedLong(span.getSpanId(), 16);
+
+    LOGGER.debug("ALEX SPAN ID {} to {}", span.getSpanId(), spanId);
 
     final String parentSpanIdRaw = span.getParentSpanId();
     long parentSpanId = 0;

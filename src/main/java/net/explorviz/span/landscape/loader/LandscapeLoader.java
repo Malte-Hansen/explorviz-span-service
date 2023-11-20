@@ -8,6 +8,7 @@ import io.smallrye.mutiny.Multi;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ public class LandscapeLoader {
   private final PreparedStatement selectSpanStructure;
   private final PreparedStatement selectSpanStructureByTime;
 
+  @Inject
   public LandscapeLoader(final QuarkusCqlSession session) {
     this.session = session;
 

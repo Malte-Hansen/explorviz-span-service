@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
   private final PreparedStatement insertTraceByTimeStatement;
   private final PreparedStatement insertSpanStructureStatement;
 
+  @Inject
   public PersistenceSpanProcessor(final QuarkusCqlSession session) {
     this.session = session;
 
@@ -63,6 +65,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
 
   @Override
   public void accept(final PersistenceSpan span) {
+
     final Set<Long> knownHashes = knownHashesByLandscape.computeIfAbsent(span.landscapeToken(),
         uuid -> ConcurrentHashMap.newKeySet());
 
