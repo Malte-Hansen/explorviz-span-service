@@ -51,7 +51,7 @@ public class TraceLoader {
         ))
         .map(Trace::fromRow)
         .flatMap(trace -> {
-          LOGGER.debug("Found trace {}", landscapeToken, trace.traceId());
+          LOGGER.debug("Found trace {}", trace.traceId());
           return session.executeReactive(selectSpanByTraceid.bind(
                   landscapeToken,
                   trace.traceId()

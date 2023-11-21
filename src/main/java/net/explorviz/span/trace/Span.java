@@ -11,7 +11,7 @@ public record Span(
     long parentSpanId, // TODO: Deviation from frontend, expects `String parentSpanId`
     long startTime,
     long endTime,
-    long methodHash // TODO: Deviation from frontend, expects `String hashCode`
+    String methodHash // TODO: Deviation from frontend, expects `String hashCode`
 ) {
   public static Span fromRow(final Row row) {
     final UUID landscapeToken = row.getUuid("landscape_token");
@@ -23,7 +23,7 @@ public record Span(
         row.getInt("start_time_s"), row.getInt("start_time_ns")) / 1_000_000L;
     final long endTime = TimestampHelper.toNanosTimestamp(
         row.getInt("end_time_s"), row.getInt("end_time_ns")) / 1_000_000L;
-    final long methodHash = row.getLong("method_hash");
+    final String methodHash = String.valueOf(row.getLong("method_hash"));
 
     return new Span(landscapeToken, traceId, spanId, parentSpanId, startTime, endTime, methodHash);
   }

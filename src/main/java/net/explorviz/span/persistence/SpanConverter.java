@@ -23,8 +23,6 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
 
     final long spanId = Long.parseUnsignedLong(span.getSpanId(), 16);
 
-    LOGGER.debug("ALEX SPAN ID {} to {}", span.getSpanId(), spanId);
-
     final String parentSpanIdRaw = span.getParentSpanId();
     long parentSpanId = 0;
     if (!parentSpanIdRaw.isEmpty()) {
@@ -44,6 +42,9 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
     final long methodHashCode =
         HashHelper.calculateSpanHash(landscapeToken, nodeIpAddress, applicationName,
             applicationInstance, methodFqn);
+
+    LOGGER.debug("ALEX SPAN ID {} to {} with methodName {} and hash {}", span.getSpanId(), spanId, methodFqn, methodHashCode);
+
     return new PersistenceSpan(landscapeToken, spanId, parentSpanId, traceId, startTime, endTime,
         nodeIpAddress, applicationName, applicationLanguage, applicationInstance, methodFqn,
         methodHashCode);

@@ -49,7 +49,7 @@ public class DefaultLandscapeAssembler implements LandscapeAssembler {
       final Class cls = getClassForRecord(record, leafPkg);
 
       // Add method to class
-      cls.methods().add(new Method(record.methodName(), record.methodHash()));
+      cls.methods().add(new Method(record.methodName(), String.valueOf(record.methodHash())));
     }
   }
 

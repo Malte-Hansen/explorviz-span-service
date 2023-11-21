@@ -100,6 +100,8 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
         span.spanId(),
         span.traceId()
     );*/
+    // "(landscape_token, trace_id, span_id, parent_span_id, start_time_s, start_time_ns, "
+    //            + "end_time_s, end_time_ns, method_hash) "
     final BoundStatement stmtByTraceid = insertSpanByTraceidStatement.bind(
         span.landscapeToken(),
         span.traceId(),
@@ -123,10 +125,14 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
       //LOGGER.error("Could not persist span by time", failure);
       return null;
     });*/
-    session.executeAsync(stmtByTraceid).exceptionally(failure -> {
-      lastFailures.incrementAndGet();
-      //LOGGER.error("Could not persist span by traceid", failure);
-      return null;
+    session.executeAsync(stmtByTraceid).whenComplete((result, failure) -> {
+      if (failure == null) {
+        LOGGER.debug("Inserting new dynamic span with method_hash={}, method_fqn={}, trace_id={}",
+            span.methodHash(), span.methodFqn(), span.traceId());
+      } else {
+        lastFailures.incrementAndGet();
+        //LOGGER.error("Could not persist trace by time", failure);
+      }
     });
     /*session.executeAsync(stmtByHash).exceptionally(failure -> {
       lastFailures.incrementAndGet();
@@ -148,6 +154,8 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     session.executeAsync(stmtByTime).whenComplete((result, failure) -> {
       if (failure == null) {
         lastSavedTraces.incrementAndGet();
+        LOGGER.debug("Inserting new trace with span with method_hash={}, method_fqn={}, trace_id={}",
+            span.methodHash(), span.methodFqn(), span.traceId());
       } else {
         lastFailures.incrementAndGet();
         //LOGGER.error("Could not persist trace by time", failure);
