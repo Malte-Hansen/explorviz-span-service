@@ -77,7 +77,8 @@ public class TraceLoader {
             TimestampHelper.extractAltSeconds(to + 999_999_999L)
         ))
         .map(Trace::fromRow)
-        .filter(trace -> trace.startTime() >= from && trace.startTime() <= to)
+        // why this? isnt this equal to the range above?
+        //.filter(trace -> trace.startTime() >= from && trace.startTime() <= to)
         .flatMap(trace -> {
           LOGGER.debug("Found trace {}", landscapeToken, trace.traceId());
           return session.executeReactive(selectSpanByTraceid.bind(

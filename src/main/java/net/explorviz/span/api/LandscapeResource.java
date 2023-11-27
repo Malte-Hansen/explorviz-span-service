@@ -73,13 +73,12 @@ public class LandscapeResource {
   @Path("/{token}/dynamic")
   public Multi<Trace> getDynamic(@PathParam("token") final String token,
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
-    //if (from == null || to == null) {
-    //  throw new BadRequestException("from and to are required");
-    //}
+    if (from == null || to == null) {
+      throw new BadRequestException("from and to are required");
+    }
 
     // TODO: Remove millisecond/nanosecond mismatch hotfix
-    // return traceLoader.loadAllTraces(parseUUID(token), from * 1_000_000L, to * 1_000_000L);
-    return traceLoader.loadAllTraces(parseUUID(token));
+    return traceLoader.loadTraces(parseUUID(token), from * 1_000_000L, to * 1_000_000L);
   }
 
   @GET

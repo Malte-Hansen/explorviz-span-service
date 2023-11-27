@@ -34,6 +34,19 @@ dependencies {
   // REST implementation (Jackson serialization) + MicroProfile OpenAPI specification
   implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
   implementation 'io.quarkus:quarkus-smallrye-openapi'
+
+  testImplementation 'io.quarkus:quarkus-junit5'
+
+  // Integration / Api Tests
+  testImplementation 'io.rest-assured:rest-assured'
+  integrationTestImplementation 'io.rest-assured:rest-assured'
+  testImplementation 'com.datastax.oss.quarkus:cassandra-quarkus-test-framework'
+  integrationTestImplementation 'com.datastax.oss.quarkus:cassandra-quarkus-test-framework'
+  testImplementation "org.testcontainers:kafka:1.17.5"
+  integrationTestImplementation "org.testcontainers:kafka:1.17.5"
+
+  // Integration Testing
+  integrationTestImplementation 'io.quarkus:quarkus-junit5'
 }
 
 group 'net.explorviz'
