@@ -1,8 +1,5 @@
 package net.explorviz.span.persistence;
 
-import static net.explorviz.span.persistence.TimestampHelper.toNanosTimestamp;
-
-import net.explorviz.span.persistence.TimestampHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -5,10 +5,10 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.quarkus.runtime.api.session.QuarkusCqlSession;
 import io.quarkus.scheduler.Scheduled;
 import io.smallrye.mutiny.Multi;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

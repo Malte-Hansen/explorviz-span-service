@@ -10,14 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(PersistenceSpanProcessor.class);
+  private static final Logger LOGGER = Logger.getLogger(PersistenceSpanProcessor.class);
 
   private final AtomicLong lastProcessedSpans = new AtomicLong(0L);
   private final AtomicLong lastSavedTraces = new AtomicLong(0L);
@@ -72,8 +71,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     if (knownHashes.add(span.methodHash())) {
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Inserting new structure with method_hash={}, method_fqn={}",
-            span.methodHash(), span.methodFqn());
+        LOGGER.debug("Inserting new structure with method_hash={}, method_fqn={}");
       }
 
       insertSpanStructure(span);
@@ -127,8 +125,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     });*/
     session.executeAsync(stmtByTraceid).whenComplete((result, failure) -> {
       if (failure == null) {
-        LOGGER.debug("Inserting new dynamic span with method_hash={}, method_fqn={}, trace_id={}",
-            span.methodHash(), span.methodFqn(), span.traceId());
+        LOGGER.debug("Inserting new dynamic span with method_hash={}, method_fqn={}, trace_id={}");
       } else {
         lastFailures.incrementAndGet();
         //LOGGER.error("Could not persist trace by time", failure);
@@ -154,8 +151,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     session.executeAsync(stmtByTime).whenComplete((result, failure) -> {
       if (failure == null) {
         lastSavedTraces.incrementAndGet();
-        LOGGER.debug("Inserting new trace with span with method_hash={}, method_fqn={}, trace_id={}",
-            span.methodHash(), span.methodFqn(), span.traceId());
+        LOGGER.debug("Inserting new trace with span with method_hash={}, method_fqn={}, trace_id={}");
       } else {
         lastFailures.incrementAndGet();
         //LOGGER.error("Could not persist trace by time", failure);
@@ -185,9 +181,8 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
         lastSavesSpanStructures.incrementAndGet();
       } else {
         lastFailures.incrementAndGet();
-        if (LOGGER.isErrorEnabled()) {
-          LOGGER.error("Could not persist structure with hash {}, removing from cache",
-              span.methodFqn(), failure);
+        if (LOGGER.isInfoEnabled()) {
+          LOGGER.error("Could not persist structure with hash {}, removing from cache");
         }
         knownHashesByLandscape.get(span.landscapeToken()).remove(span.methodHash());
       }
@@ -199,11 +194,10 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
     final long processedSpans = this.lastProcessedSpans.getAndSet(0);
     final long savedTraces = this.lastSavedTraces.getAndSet(0);
     final long savesSpanStructures = this.lastSavesSpanStructures.getAndSet(0);
-    LOGGER.debug("Processed {} spans, inserted {} traces and {} span structures.", processedSpans,
-        savedTraces, savesSpanStructures);
+    LOGGER.debug("Processed {} spans, inserted {} traces and {} span structures.");
     final long failures = this.lastFailures.getAndSet(0);
     if (failures != 0) {
-      LOGGER.warn("Data loss occured. {} inserts failed", failures);
+      LOGGER.warn("Data loss occured. {} inserts failed");
     }
   }
 }

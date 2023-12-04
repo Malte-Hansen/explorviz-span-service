@@ -1,7 +1,7 @@
 package net.explorviz.span.persistence;
 
 import java.util.UUID;
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import net.explorviz.avro.Span;
 import net.explorviz.span.hash.HashHelper;
 import org.apache.kafka.streams.kstream.ValueMapper;

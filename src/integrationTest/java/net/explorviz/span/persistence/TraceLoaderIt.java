@@ -4,7 +4,7 @@ import com.datastax.oss.quarkus.test.CassandraTestResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import net.explorviz.span.kafka.KafkaTestResource;
 import net.explorviz.span.trace.Span;
 import net.explorviz.span.trace.Trace;
@@ -44,7 +44,7 @@ public class TraceLoaderIt {
 
   private Span convertPersistenceSpanToSpan(PersistenceSpan ps) {
     return new Span(ps.landscapeToken(), ps.traceId(), ps.spanId(), ps.parentSpanId(),
-        ps.startTime() * 1_000_000, ps.endTime() * 1_000_000, String.valueOf(ps.methodHash()));
+        ps.startTime() / 1_000_000L, ps.endTime() / 1_000_000L, String.valueOf(ps.methodHash()));
   }
 
   @Test
@@ -73,17 +73,17 @@ public class TraceLoaderIt {
     long endLate = 1701081834000000000L;
 
     final PersistenceSpan earlySpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 123L, 0L, 456L, startEarly,
+        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 123L, 0L, 1L, startEarly,
             endEarly, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()",
             847);
 
     final PersistenceSpan expectedSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 123L, 0L, 456L, startExpected,
+        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 456L, 0L, 2L, startExpected,
             endExpected, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()",
             847);
 
     final PersistenceSpan lateSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 123L, 0L, 456L, startLate,
+        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 789L, 0L, 3L, startLate,
             endLate, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()",
             847);
 
@@ -95,6 +95,7 @@ public class TraceLoaderIt {
         1701081832000000000L).collect().asList().await().indefinitely();
 
     Assertions.assertEquals(1, result.size(), "List of traces has wrong size.");
+    Assertions.assertEquals(1, result.get(0).spanList().size(), "List of spans has wrong size.");
     Assertions.assertEquals(convertPersistenceSpanToSpan(expectedSpan), result.get(0).spanList().get(0), "Wrong span in trace.");
   }
 
