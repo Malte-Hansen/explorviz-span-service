@@ -1,4 +1,4 @@
-image: openjdk:17-jdk
+image: ghcr.io/graalvm/graalvm-community:21
 
 # Disable the Gradle daemon for Continuous Integration servers as correctness
 # is usually a priority over speed in CI environments. Using a fresh
@@ -54,7 +54,6 @@ checkstyle:
       - build
 
 push-dockerhub-native:
-  image: ghcr.io/graalvm/graalvm-ce:ol7-java17-22.3.0
   stage: publish
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
