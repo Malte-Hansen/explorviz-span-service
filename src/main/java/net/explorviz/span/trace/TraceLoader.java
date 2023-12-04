@@ -6,9 +6,8 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import net.explorviz.span.persistence.TimestampHelper;
-
 import java.util.UUID;
+import net.explorviz.span.persistence.TimestampHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,7 @@ public class TraceLoader {
   }
 
   public Multi<Trace> loadAllTraces(final UUID landscapeToken) {
-    LOGGER.trace("Loading landscape {} traces in time range", landscapeToken);
+    LOGGER.atTrace().addArgument(landscapeToken).log("Loading all traces for token {}");
 
     // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
     // TODO: Is from/to inclusive/exclusive?
@@ -53,7 +52,7 @@ public class TraceLoader {
         ))
         .map(Trace::fromRow)
         .flatMap(trace -> {
-          LOGGER.debug("Found trace {}", trace.traceId());
+          LOGGER.atTrace().addArgument(() -> trace.traceId()).log("Found trace {}");
           return session.executeReactive(selectSpanByTraceid.bind(
                   landscapeToken,
                   trace.traceId()
@@ -69,7 +68,8 @@ public class TraceLoader {
   }
 
   public Multi<Trace> loadTraces(final UUID landscapeToken, final long from, final long to) {
-    LOGGER.trace("Loading landscape {} traces in time range {}-{}", landscapeToken, from, to);
+    LOGGER.atTrace().addArgument(landscapeToken).addArgument(from).addArgument(to)
+        .log("Loading all traces for token {} in range {} to {}");
 
     // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
     // TODO: Is from/to inclusive/exclusive?
@@ -101,7 +101,8 @@ public class TraceLoader {
   // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
 
   public Uni<Trace> loadTrace(final UUID landscapeToken, final long traceId) {
-    LOGGER.trace("Loading landscape {} trace {}", landscapeToken, traceId);
+    LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
+        .log("Loading trace {} for token {}");
 
     return session.executeReactive(selectSpanByTraceid.bind(
             landscapeToken,
