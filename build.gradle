@@ -15,47 +15,6 @@ repositories {
   }
 }
 
-sourceSets {
-  integrationTest {
-    java.srcDir file('src/integrationTest/java')
-    compileClasspath += sourceSets.main.output
-    runtimeClasspath += sourceSets.main.output
-  }
-}
-
-task integrationTest(type: Test) {
-  description = 'Runs integration tests.'
-  group = 'verification'
-
-  testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
-  shouldRunAfter test
-}
-
-tasks.named('compileTestJava') {
-  dependsOn 'jandex'
-}
-
-tasks.named('test') {
-  dependsOn 'jandex'
-}
-
-tasks.named('compileIntegrationTestJava') {
-  dependsOn 'jandex'
-}
-
-tasks.named('integrationTest') {
-  dependsOn 'jandex'
-}
-
-configurations {
-  integrationTestImplementation.extendsFrom implementation
-  integrationTestRuntimeOnly.extendsFrom runtimeOnly
-
-  integrationTestImplementation.setCanBeResolved(true)
-  integrationTestRuntimeOnly.setCanBeResolved(true)
-}
-
 dependencies {
   implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
 
@@ -110,6 +69,53 @@ compileTestJava {
 java {
   sourceCompatibility = JavaVersion.VERSION_21
   targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Tasks Setups //
+
+sourceSets {
+  integrationTest {
+    java.srcDir file('src/integrationTest/java')
+    compileClasspath += sourceSets.main.output
+    runtimeClasspath += sourceSets.main.output
+  }
+}
+
+task integrationTest(type: Test) {
+  description = 'Runs integration tests.'
+  group = 'verification'
+
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  shouldRunAfter test
+}
+
+configurations {
+  integrationTestImplementation.extendsFrom implementation
+  integrationTestRuntimeOnly.extendsFrom runtimeOnly
+
+  integrationTestImplementation.setCanBeResolved(true)
+  integrationTestRuntimeOnly.setCanBeResolved(true)
+}
+
+tasks.named('compileTestJava') {
+  dependsOn 'jandex'
+}
+
+tasks.named('test') {
+  dependsOn 'jandex'
+}
+
+tasks.named('compileIntegrationTestJava') {
+  dependsOn 'jandex'
+}
+
+tasks.named('integrationTest') {
+  dependsOn 'jandex'
+}
+
+tasks.named('quarkusDependenciesBuild') {
+  dependsOn 'jandex'
 }
 
 tasks.withType(JavaCompile).configureEach {
