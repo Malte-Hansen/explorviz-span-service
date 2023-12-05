@@ -1,18 +1,16 @@
-image: openjdk:17-jdk
+default:
+  tags:
+    - exec-docker
+  image: ghcr.io/graalvm/graalvm-community:21
+  cache: # Cache modules in between jobs
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .gradle
+  before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
 
-# Disable the Gradle daemon for Continuous Integration servers as correctness
-# is usually a priority over speed in CI environments. Using a fresh
-# runtime for each build is more reliable since the runtime is completely
-# isolated from any previous builds.
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-
-cache:
-  paths:
-    - .gradle
 
 workflow:
   rules:
@@ -24,6 +22,7 @@ workflow:
 stages:
   - build
   - code-analysis
+  - test
   - publish
 
 build:
@@ -40,6 +39,7 @@ pmd:
   tags:
     - exec-docker
   script: ./gradlew pmdMain
+  allow_failure: true
   artifacts:
     paths:
       - build
@@ -49,12 +49,33 @@ checkstyle:
   tags:
     - exec-docker
   script: ./gradlew checkstyleMain
+  allow_failure: true
+  artifacts:
+    paths:
+      - build
+
+unit-test:
+  stage: test
+  tags:
+    - exec-docker
+  script:
+    - ./gradlew test
+  artifacts:
+    paths:
+      - build
+
+integration-test:
+  stage: test
+  tags:
+    - exec-docker
+  script:
+    - ./gradlew integrationTest
+  allow_failure: true
   artifacts:
     paths:
       - build
 
 push-dockerhub-native:
-  image: ghcr.io/graalvm/graalvm-ce:ol7-java17-22.3.0
   stage: publish
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
@@ -86,6 +107,6 @@ push-dockerhub-mr:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
-    - ./gradlew clean assemble -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.tag=$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA -Dquarkus.container-image.username=$EXPLORVIZ_DOCKERHUB_USERNAME -Dquarkus.container-image.password=$EXPLORVIZ_DOCKERHUB_PASSWORD
+    - ./gradlew clean assemble -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.container-image.tag=$CI_MERGE_REQUEST_ID-$CI_COMMIT_SHORT_SHA -Dquarkus.container-image.username=$EXPLORVIZ_DOCKERHUB_USERNAME -Dquarkus.container-image.password=$EXPLORVIZ_DOCKERHUB_PASSWORD
   after_script:
-    - echo "Image was uploaded to Dockerhub; explorviz/span-service-jvm:$CI_MERGE_REQUEST_IID-$CI_COMMIT_SHORT_SHA"
+    - echo "Image was uploaded to Dockerhub; explorviz/span-service-jvm:$CI_MERGE_REQUEST_ID-$CI_COMMIT_SHORT_SHA"

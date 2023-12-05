@@ -1,10 +1,10 @@
 package net.explorviz.span.kafka;
 
 import io.quarkus.scheduler.Scheduled;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 import net.explorviz.avro.Span;
 import net.explorviz.span.persistence.PersistenceSpan;
 import net.explorviz.span.persistence.PersistenceSpanProcessor;
@@ -77,6 +77,7 @@ public class TopologyProducer {
   @Scheduled(every = "{explorviz.log.span.interval}")
   public void logStatus() {
     final int receivedSpans = this.lastReceivedSpans.getAndSet(0);
-    LOGGER.debug("Received {} spans.", receivedSpans);
+    LOGGER.atDebug().addArgument(receivedSpans)
+        .log("Received {} spans.");
   }
 }

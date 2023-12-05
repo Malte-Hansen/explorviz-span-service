@@ -5,9 +5,10 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.quarkus.runtime.api.session.QuarkusCqlSession;
 import io.quarkus.scheduler.Scheduled;
 import io.smallrye.mutiny.Multi;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ public class LandscapeLoader {
   private final PreparedStatement selectSpanStructure;
   private final PreparedStatement selectSpanStructureByTime;
 
+  @Inject
   public LandscapeLoader(final QuarkusCqlSession session) {
     this.session = session;
 
@@ -38,18 +40,24 @@ public class LandscapeLoader {
   }
 
   public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken) {
-    LOGGER.debug("Loading landscape {}", landscapeToken);
+    LOGGER.atTrace().addArgument(landscapeToken).log("Loading landscape {} structure");
 
-    final BoundStatement stmtSelect = selectSpanStructure.bind(landscapeToken);
+    final BoundStatement stmtSelect = selectSpanStructure.bind(
+        landscapeToken
+    );
     return executeQuery(stmtSelect);
   }
 
   public Multi<LandscapeRecord> loadLandscape(final UUID landscapeToken, final long from,
       final long to) {
-    LOGGER.debug("Loading landscape {} in time range {}-{}", landscapeToken, from, to);
+    LOGGER.atTrace().addArgument(landscapeToken).addArgument(from).addArgument(to)
+        .log("Loading landscape {} structure in time range {}-{}");
 
-    final BoundStatement stmtSelectByTime =
-        selectSpanStructureByTime.bind(landscapeToken, from, to);
+    final BoundStatement stmtSelectByTime = selectSpanStructureByTime.bind(
+        landscapeToken,
+        from,
+        to
+    );
     return executeQuery(stmtSelectByTime);
   }
 
@@ -65,7 +73,7 @@ public class LandscapeLoader {
   public void logStatus() {
     final long loadedLandscapes = this.lastRequestedLandscapes.getAndSet(0);
     final long loadedStructures = this.lastLoadedStructures.getAndSet(0);
-    LOGGER.debug("Requested {} landscapes. Loaded {} structures.", loadedLandscapes,
-        loadedStructures);
+    LOGGER.atDebug().addArgument(loadedLandscapes).addArgument(loadedStructures)
+        .log("Requested {} landscapes. Loaded {} structures.");
   }
 }

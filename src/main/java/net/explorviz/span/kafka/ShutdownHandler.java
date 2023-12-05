@@ -3,9 +3,9 @@ package net.explorviz.span.kafka;
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.KafkaStreams.State;
 import org.apache.kafka.streams.KafkaStreams.StateListener;
@@ -37,10 +37,12 @@ public class ShutdownHandler {
     @Override
     public void onChange(final State newState, final State oldState) {
       if (newState == State.ERROR) {
-        LOGGER.error("Kafka Streams thread died. "
-            + "Are Kafka topic initialized? Quarkus application will shut down.");
 
-        LOGGER.error("About to system exit due to Kafka Streams Error.");
+        LOGGER.atError().log("Kafka Streams thread died. Are Kafka topic initialized? "
+            + "Quarkus application will shut down.");
+
+        LOGGER.atError().log("About to system exit due to Kafka Streams Error.");
+
         Quarkus.asyncExit(-1);
         Quarkus.waitForExit();
         System.exit(-1); // NOPMD

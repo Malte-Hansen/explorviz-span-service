@@ -1,11 +1,11 @@
 package net.explorviz.span.landscape.assembler.impl;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-import javax.enterprise.context.ApplicationScoped;
 import net.explorviz.span.landscape.Application;
 import net.explorviz.span.landscape.Class;
 import net.explorviz.span.landscape.Landscape;
@@ -49,7 +49,7 @@ public class DefaultLandscapeAssembler implements LandscapeAssembler {
       final Class cls = getClassForRecord(record, leafPkg);
 
       // Add method to class
-      cls.methods().add(new Method(record.methodName(), record.methodHash()));
+      cls.methods().add(new Method(record.methodName(), String.valueOf(record.methodHash())));
     }
   }
 

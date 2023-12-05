@@ -3,7 +3,7 @@ package net.explorviz.span.kafka;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.quarkus.arc.DefaultBean;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Produces;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**

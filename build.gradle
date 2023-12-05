@@ -2,6 +2,7 @@ plugins {
   id 'java'
   id 'io.quarkus'
   id 'com.adarshr.test-logger' version '3.2.0'
+  id "org.kordamp.gradle.jandex" version "1.1.0"
 }
 
 apply from: 'code-analysis/code-analysis.gradle'
@@ -31,9 +32,26 @@ dependencies {
   implementation 'io.quarkus:quarkus-confluent-registry-avro'
   implementation group: 'io.confluent', name: 'kafka-streams-avro-serde', version: "${confluentAvroSerdeVersion}"
 
+  //implementation("org.jboss.slf4j:slf4j-jboss-logmanager")
+  //testImplementation("org.jboss.slf4j:slf4j-jboss-logmanager")
+  //integrationTestImplementation("org.jboss.slf4j:slf4j-jboss-logmanager")
+
   // REST implementation (Jackson serialization) + MicroProfile OpenAPI specification
   implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
   implementation 'io.quarkus:quarkus-smallrye-openapi'
+
+  testImplementation 'io.quarkus:quarkus-junit5'
+
+  // Integration / Api Tests
+  testImplementation 'io.rest-assured:rest-assured'
+  integrationTestImplementation 'io.rest-assured:rest-assured'
+  testImplementation 'com.datastax.oss.quarkus:cassandra-quarkus-test-framework'
+  integrationTestImplementation 'com.datastax.oss.quarkus:cassandra-quarkus-test-framework'
+  testImplementation "org.testcontainers:kafka:1.17.5"
+  integrationTestImplementation "org.testcontainers:kafka:1.17.5"
+
+  // Integration Testing
+  integrationTestImplementation 'io.quarkus:quarkus-junit5'
 }
 
 group 'net.explorviz'
@@ -49,8 +67,66 @@ compileTestJava {
 }
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Tasks Setups //
+
+sourceSets {
+  integrationTest {
+    java.srcDir file('src/integrationTest/java')
+    compileClasspath += sourceSets.main.output
+    runtimeClasspath += sourceSets.main.output
+  }
+}
+
+task integrationTest(type: Test) {
+  description = 'Runs integration tests.'
+  group = 'verification'
+
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  shouldRunAfter test
+}
+
+configurations {
+  integrationTestImplementation.extendsFrom implementation
+  integrationTestRuntimeOnly.extendsFrom runtimeOnly
+
+  integrationTestImplementation.setCanBeResolved(true)
+  integrationTestRuntimeOnly.setCanBeResolved(true)
+}
+
+// Regarding jandex dependency for each task
+// https://github.com/kordamp/jandex-gradle-plugin/issues/9
+
+tasks.named('checkstyleMain') {
+  dependsOn 'jandex'
+}
+
+tasks.named('pmdMain') {
+  dependsOn 'jandex'
+}
+
+tasks.named('compileTestJava') {
+  dependsOn 'jandex'
+}
+
+tasks.named('test') {
+  dependsOn 'jandex'
+}
+
+tasks.named('compileIntegrationTestJava') {
+  dependsOn 'jandex'
+}
+
+tasks.named('integrationTest') {
+  dependsOn 'jandex'
+}
+
+tasks.named('quarkusDependenciesBuild') {
+  dependsOn 'jandex'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -59,5 +135,11 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 test {
-  systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+  useJUnitPlatform()
+  testLogging.showStandardStreams = true
+}
+
+integrationTest {
+  useJUnitPlatform()
+  testLogging.showStandardStreams = true
 }
