@@ -1,18 +1,16 @@
-image: ghcr.io/graalvm/graalvm-community:21
+default:
+  tags:
+    - exec-docker
+  image: ghcr.io/graalvm/graalvm-community:21
+  cache: # Cache modules in between jobs
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .gradle
+  before_script:
+    - export GRADLE_USER_HOME=`pwd`/.gradle
 
-# Disable the Gradle daemon for Continuous Integration servers as correctness
-# is usually a priority over speed in CI environments. Using a fresh
-# runtime for each build is more reliable since the runtime is completely
-# isolated from any previous builds.
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle
-
-cache:
-  paths:
-    - .gradle
 
 workflow:
   rules:
@@ -70,10 +68,6 @@ integration-test:
   stage: test
   tags:
     - exec-docker
-  services:
-    - docker:dind
-  variables:
-    FF_NETWORK_PER_BUILD: "true"
   script:
     - ./gradlew integrationTest
   allow_failure: true
