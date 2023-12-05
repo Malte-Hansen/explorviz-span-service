@@ -1,12 +1,12 @@
 package net.explorviz.span.trace;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import net.explorviz.span.persistence.TimestampHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import net.explorviz.span.persistence.TimestampHelper;
 
 public record Trace(
     UUID landscapeToken,
@@ -36,11 +36,11 @@ public record Trace(
   }
 
   public static Trace fromSpanList(final List<Span> spans) {
-    Optional<Span> root = spans.stream().filter(span -> span.parentSpanId() == 0).findAny();
+    final Optional<Span> root = spans.stream().filter(span -> span.parentSpanId() == 0).findAny();
     if (root.isEmpty()) {
       throw new IllegalArgumentException("No root span found in span list");
     }
-    Span span = root.get();
+    final Span span = root.get();
 
     final UUID landscapeToken = span.landscapeToken();
     final long traceId = span.traceId();

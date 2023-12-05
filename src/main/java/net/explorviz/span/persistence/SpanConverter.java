@@ -11,7 +11,7 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
 
   @Override
   public PersistenceSpan apply(final Span span) {
-    String landscapeTokenRaw = span.getLandscapeToken();
+    final String landscapeTokenRaw = span.getLandscapeToken();
     // TODO: Remove invalid UUID hotfix
     UUID landscapeToken = PersistenceSpan.DEFAULT_UUID;
     if (!"mytokenvalue".equals(landscapeTokenRaw)) {

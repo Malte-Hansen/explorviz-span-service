@@ -98,6 +98,17 @@ configurations {
   integrationTestRuntimeOnly.setCanBeResolved(true)
 }
 
+// Regarding jandex dependency for each task
+// https://github.com/kordamp/jandex-gradle-plugin/issues/9
+
+tasks.named('checkstyleMain') {
+  dependsOn 'jandex'
+}
+
+tasks.named('pmdMain') {
+  dependsOn 'jandex'
+}
+
 tasks.named('compileTestJava') {
   dependsOn 'jandex'
 }

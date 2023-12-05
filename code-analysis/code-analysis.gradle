@@ -26,21 +26,5 @@ checkstyle {
   configFile = file("code-analysis/checkstyle.xml")
   maxWarnings = 0
   ignoreFailures = false
-  toolVersion = "10.6.0"
-}
-
-task checkstyle {
-  group 'Quality Assurance'
-  description 'Run Checkstyle'
-  
-  dependsOn 'checkstyleMain'
-  dependsOn 'checkstyleTest'
-}
-
-task pmd {
-  group 'Quality Assurance'
-  description 'Run PMD'
-
-  dependsOn 'pmdMain'
-  dependsOn 'pmdTest'
+  toolVersion = "10.12.5"
 }

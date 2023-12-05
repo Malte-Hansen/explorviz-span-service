@@ -1,8 +1,8 @@
 package net.explorviz.span.trace;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import net.explorviz.span.persistence.TimestampHelper;
 import java.util.UUID;
+import net.explorviz.span.persistence.TimestampHelper;
 
 public record Span(
     UUID landscapeToken, // TODO: Deviation from frontend, expects `String landscapeToken`

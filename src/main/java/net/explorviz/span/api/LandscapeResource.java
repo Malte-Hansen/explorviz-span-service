@@ -48,15 +48,15 @@ public class LandscapeResource {
   @APIResponses(@APIResponse(responseCode = "200", description = "Success",
       content = @Content(mediaType = "application/json",
           schema = @Schema(implementation = Landscape.class))))
-  public Uni<Landscape> getStructure(@PathParam("token") String token,
+  public Uni<Landscape> getStructure(@PathParam("token") final String token,
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
     final Multi<LandscapeRecord> recordMulti;
     if (from == null || to == null) {
       // TODO: Cache (shared with PersistenceSpanProcessor?)
-      recordMulti = landscapeLoader.loadLandscape(parseUUID(token));
+      recordMulti = landscapeLoader.loadLandscape(parseUuid(token));
     } else {
       // TODO: Remove millisecond/nanosecond mismatch hotfix
-      recordMulti = landscapeLoader.loadLandscape(parseUUID(token),
+      recordMulti = landscapeLoader.loadLandscape(parseUuid(token),
           from * 1_000_000L, to * 1_000_000L);
     }
 
@@ -78,17 +78,17 @@ public class LandscapeResource {
     }
 
     // TODO: Remove millisecond/nanosecond mismatch hotfix
-    return traceLoader.loadTraces(parseUUID(token), from * 1_000_000L, to * 1_000_000L);
+    return traceLoader.loadTraces(parseUuid(token), from * 1_000_000L, to * 1_000_000L);
   }
 
   @GET
   @Path("/{token}/dynamic/{traceid}")
   public Uni<Trace> getDynamicTrace(@PathParam("token") final String token,
       @PathParam("traceid") final Long traceId) {
-    return traceLoader.loadTrace(parseUUID(token), traceId);
+    return traceLoader.loadTrace(parseUuid(token), traceId);
   }
 
-  private UUID parseUUID(String token) {
+  private UUID parseUuid(final String token) {
     // TODO: Remove invalid token hotfix
     if ("mytokenvalue".equals(token)) {
       return PersistenceSpan.DEFAULT_UUID;

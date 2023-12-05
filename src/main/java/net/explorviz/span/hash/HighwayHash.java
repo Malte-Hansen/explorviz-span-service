@@ -42,7 +42,8 @@ public final class HighwayHash {
    * @param key    array of size 4 with the key to initialize the hash with
    * @return 64-bit hash for the given data
    */
-  public static long hash64(final byte[] data, final int offset, final int length, final long[] key) {
+  public static long hash64(final byte[] data, final int offset, final int length,
+      final long[] key) {
     final HighwayHash h = new HighwayHash(key);
     h.processAll(data, offset, length);
     return h.finalize64();
@@ -259,7 +260,8 @@ public final class HighwayHash {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  private void modularReduction(final long a3_unmasked, final long a2, final long a1, final long a0, final long[] hash, final int pos) {
+  private void modularReduction(final long a3_unmasked, final long a2, final long a1, final long a0,
+      final long[] hash, final int pos) {
     final long a3 = a3_unmasked & 0x3FFFFFFFFFFFFFFFL;
     hash[pos + 1] = a1 ^ ((a3 << 1) | (a2 >>> 63)) ^ ((a3 << 2) | (a2 >>> 62));
     hash[pos] = a0 ^ (a2 << 1) ^ (a2 << 2);

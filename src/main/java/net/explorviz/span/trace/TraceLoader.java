@@ -26,20 +26,13 @@ public class TraceLoader {
   public TraceLoader(final QuarkusCqlSession session) {
     this.session = session;
 
-    this.selectAllTraces = session.prepare("SELECT * "
-        + "FROM trace_by_time "
-        + "WHERE landscape_token = ? "
-        + "ALLOW FILTERING");
-    this.selectTraceByTime = session.prepare("SELECT * "
-        + "FROM trace_by_time "
-        + "WHERE landscape_token = ? "
-        + "AND start_time_s >= ? "
-        + "AND end_time_s <= ? "
-        + "ALLOW FILTERING");
-    this.selectSpanByTraceid = session.prepare("SELECT * "
-        + "FROM span_by_traceid "
-        + "WHERE landscape_token = ? "
-        + "AND trace_id = ?");
+    this.selectAllTraces = session.prepare(
+        "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? " + "ALLOW FILTERING");
+    this.selectTraceByTime = session.prepare(
+        "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? "
+            + "AND start_time_s >= ? " + "AND end_time_s <= ? " + "ALLOW FILTERING");
+    this.selectSpanByTraceid = session.prepare(
+        "SELECT * " + "FROM span_by_traceid " + "WHERE landscape_token = ? " + "AND trace_id = ?");
   }
 
   public Multi<Trace> loadAllTraces(final UUID landscapeToken) {
@@ -47,23 +40,14 @@ public class TraceLoader {
 
     // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
     // TODO: Is from/to inclusive/exclusive?
-    return session.executeReactive(selectAllTraces.bind(
-            landscapeToken
-        ))
-        .map(Trace::fromRow)
+    return session.executeReactive(selectAllTraces.bind(landscapeToken)).map(Trace::fromRow)
         .flatMap(trace -> {
           LOGGER.atTrace().addArgument(() -> trace.traceId()).log("Found trace {}");
-          return session.executeReactive(selectSpanByTraceid.bind(
-                  landscapeToken,
-                  trace.traceId()
-              ))
-              .map(Span::fromRow)
-              .collect().asList()
-              .map(spanList -> {
+          return session.executeReactive(selectSpanByTraceid.bind(landscapeToken, trace.traceId()))
+              .map(Span::fromRow).collect().asList().map(spanList -> {
                 trace.spanList().addAll(spanList);
                 return trace;
-              })
-              .toMulti();
+              }).toMulti();
         });
   }
 
@@ -73,28 +57,20 @@ public class TraceLoader {
 
     // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
     // TODO: Is from/to inclusive/exclusive?
-    return session.executeReactive(selectTraceByTime.bind(
-            landscapeToken,
-            TimestampHelper.extractAltSeconds(from),
-            //TimestampHelper.extractAltSeconds(to + 999_999_999L)
-            TimestampHelper.extractAltSeconds(to)
-        ))
-        .map(Trace::fromRow)
+    return session.executeReactive(
+            selectTraceByTime.bind(landscapeToken, TimestampHelper.extractAltSeconds(from),
+                //TimestampHelper.extractAltSeconds(to + 999_999_999L)
+                TimestampHelper.extractAltSeconds(to))).map(Trace::fromRow)
         // why this? isnt this equal to the range above?
-        //.filter(trace -> trace.startTime() >= from / 1_000_000L && trace.startTime() <= to / 1_000_000L)
+        //.filter(trace -> trace.startTime() >= from / 1_000_000L &&
+        // trace.startTime() <= to / 1_000_000L)
         .flatMap(trace -> {
           LOGGER.atTrace().addArgument(() -> trace.traceId()).log("Found trace {}");
-          return session.executeReactive(selectSpanByTraceid.bind(
-                  landscapeToken,
-                  trace.traceId()
-              ))
-              .map(Span::fromRow)
-              .collect().asList()
-              .map(spanList -> {
+          return session.executeReactive(selectSpanByTraceid.bind(landscapeToken, trace.traceId()))
+              .map(Span::fromRow).collect().asList().map(spanList -> {
                 trace.spanList().addAll(spanList);
                 return trace;
-              })
-              .toMulti();
+              }).toMulti();
         });
   }
 
@@ -104,12 +80,7 @@ public class TraceLoader {
     LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
         .log("Loading trace {} for token {}");
 
-    return session.executeReactive(selectSpanByTraceid.bind(
-            landscapeToken,
-            traceId
-        ))
-        .map(Span::fromRow)
-        .collect().asList()
-        .map(Trace::fromSpanList);
+    return session.executeReactive(selectSpanByTraceid.bind(landscapeToken, traceId))
+        .map(Span::fromRow).collect().asList().map(Trace::fromSpanList);
   }
 }

@@ -38,8 +38,8 @@ public class ShutdownHandler {
     public void onChange(final State newState, final State oldState) {
       if (newState == State.ERROR) {
 
-        LOGGER.atError().log(
-            "Kafka Streams thread died. Are Kafka topic initialized? Quarkus application will shut down.");
+        LOGGER.atError().log("Kafka Streams thread died. Are Kafka topic initialized? "
+            + "Quarkus application will shut down.");
 
         LOGGER.atError().log("About to system exit due to Kafka Streams Error.");
 

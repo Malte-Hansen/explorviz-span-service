@@ -27,12 +27,12 @@ public final class TimestampHelper {
     return (altSeconds - Integer.MIN_VALUE) * NANOS_PER_SEC + nanos;
   }
 
-  public static void main(String[] args) throws InterruptedException {
-    long time = System.currentTimeMillis() * 1_000_000L;
+  public static void main(final String[] args) throws InterruptedException {
+    final long time = System.currentTimeMillis() * 1_000_000L;
     System.out.println(time);
 
-    int altSeconds = extractAltSeconds(time);
-    int nanos = extractNanos(time);
+    final int altSeconds = extractAltSeconds(time);
+    final int nanos = extractNanos(time);
     System.out.println(altSeconds);
     System.out.println(nanos);
     //Thread.sleep(1000);
