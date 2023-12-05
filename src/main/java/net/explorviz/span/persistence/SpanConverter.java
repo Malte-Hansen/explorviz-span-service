@@ -1,16 +1,13 @@
 package net.explorviz.span.persistence;
 
-import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.UUID;
 import net.explorviz.avro.Span;
 import net.explorviz.span.hash.HashHelper;
 import org.apache.kafka.streams.kstream.ValueMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SpanConverter.class);
 
   @Override
   public PersistenceSpan apply(final Span span) {
@@ -42,8 +39,6 @@ public class SpanConverter implements ValueMapper<Span, PersistenceSpan> {
     final long methodHashCode =
         HashHelper.calculateSpanHash(landscapeToken, nodeIpAddress, applicationName,
             applicationInstance, methodFqn);
-
-    LOGGER.debug("ALEX SPAN ID {} to {} with methodName {} and hash {}", span.getSpanId(), spanId, methodFqn, methodHashCode);
 
     return new PersistenceSpan(landscapeToken, spanId, parentSpanId, traceId, startTime, endTime,
         nodeIpAddress, applicationName, applicationLanguage, applicationInstance, methodFqn,

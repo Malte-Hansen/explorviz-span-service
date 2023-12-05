@@ -77,6 +77,7 @@ public class TopologyProducer {
   @Scheduled(every = "{explorviz.log.span.interval}")
   public void logStatus() {
     final int receivedSpans = this.lastReceivedSpans.getAndSet(0);
-    LOGGER.debug("Received {} spans.", receivedSpans);
+    LOGGER.atDebug().addArgument(receivedSpans)
+        .log("Received {} spans.");
   }
 }

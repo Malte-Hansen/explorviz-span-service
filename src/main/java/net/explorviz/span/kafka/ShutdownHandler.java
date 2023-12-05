@@ -37,10 +37,12 @@ public class ShutdownHandler {
     @Override
     public void onChange(final State newState, final State oldState) {
       if (newState == State.ERROR) {
-        LOGGER.error("Kafka Streams thread died. "
-            + "Are Kafka topic initialized? Quarkus application will shut down.");
 
-        LOGGER.error("About to system exit due to Kafka Streams Error.");
+        LOGGER.atError().log(
+            "Kafka Streams thread died. Are Kafka topic initialized? Quarkus application will shut down.");
+
+        LOGGER.atError().log("About to system exit due to Kafka Streams Error.");
+
         Quarkus.asyncExit(-1);
         Quarkus.waitForExit();
         System.exit(-1); // NOPMD
