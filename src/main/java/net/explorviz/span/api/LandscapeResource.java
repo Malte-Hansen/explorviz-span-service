@@ -28,10 +28,15 @@ import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/v2/landscapes")
 @Produces(MediaType.APPLICATION_JSON)
 public class LandscapeResource {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(LandscapeResource.class);
+
   @Inject
   public LandscapeLoader landscapeLoader;
 
@@ -79,6 +84,7 @@ public class LandscapeResource {
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
 
     if (!isTimeVerificationEnabled) {
+      LOGGER.atWarn().log("Time ranges are disabled, will always return ALL traces");
       return traceLoader.loadAllTraces(parseUuid(token));
     }
 
