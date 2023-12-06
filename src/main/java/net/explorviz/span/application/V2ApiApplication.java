@@ -1,4 +1,4 @@
-package net.explorviz.span.api;
+package net.explorviz.span.application;
 
 import jakarta.ws.rs.core.Application;
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;

@@ -22,6 +22,7 @@ import net.explorviz.span.landscape.loader.LandscapeRecord;
 import net.explorviz.span.persistence.PersistenceSpan;
 import net.explorviz.span.trace.Trace;
 import net.explorviz.span.trace.TraceLoader;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -40,6 +41,9 @@ public class LandscapeResource {
   @Inject
   public TraceLoader traceLoader;
 
+  @ConfigProperty(name = "explorviz.span.api.timeverification.enabled")
+  /* default */ boolean isTimeVerificationEnabled;
+
   @GET
   @Path("/{token}/structure")
   @Operation(summary = "Retrieve a landscape graph",
@@ -51,28 +55,33 @@ public class LandscapeResource {
   public Uni<Landscape> getStructure(@PathParam("token") final String token,
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
     final Multi<LandscapeRecord> recordMulti;
-    if (from == null || to == null) {
+
+    if (!isTimeVerificationEnabled || from == null || to == null) {
       // TODO: Cache (shared with PersistenceSpanProcessor?)
       recordMulti = landscapeLoader.loadLandscape(parseUuid(token));
     } else {
       // TODO: Remove millisecond/nanosecond mismatch hotfix
-      recordMulti = landscapeLoader.loadLandscape(parseUuid(token),
-          from * 1_000_000L, to * 1_000_000L);
+      recordMulti =
+          landscapeLoader.loadLandscape(parseUuid(token), from * 1_000_000L, to * 1_000_000L);
     }
 
-    return recordMulti.collect().asList()
-        .map(landscapeAssembler::assembleFromRecords)
+    return recordMulti.collect().asList().map(landscapeAssembler::assembleFromRecords)
         .onFailure(NoRecordsException.class)
         .transform(t -> new NotFoundException("Landscape not found or empty", t))
-        .onFailure(LandscapeAssemblyException.class)
-        .transform(t ->
-            new InternalServerErrorException("Landscape assembly error: " + t.getMessage(), t));
+        .onFailure(LandscapeAssemblyException.class).transform(
+            t -> new InternalServerErrorException("Landscape assembly error: " + t.getMessage(),
+                t));
   }
 
   @GET
   @Path("/{token}/dynamic")
   public Multi<Trace> getDynamic(@PathParam("token") final String token,
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
+
+    if (!isTimeVerificationEnabled) {
+      return traceLoader.loadAllTraces(parseUuid(token));
+    }
+
     if (from == null || to == null) {
       throw new BadRequestException("from and to are required");
     }
