@@ -7,6 +7,7 @@ import net.explorviz.span.landscape.loader.LandscapeRecord;
 
 // TODO: Change so it can start assembling from Multi instead of Collection?
 public interface LandscapeAssembler {
+
   /**
    * Assembles a landscape model out of a collection of {@link LandscapeRecord}s. The resulting
    * landscape is a hierarchical/tree representation of all records. All records must have the same

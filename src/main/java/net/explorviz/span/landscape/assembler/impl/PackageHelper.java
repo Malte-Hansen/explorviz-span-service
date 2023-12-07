@@ -54,9 +54,8 @@ public final class PackageHelper {
   public static int lowestPackageIndex(final Application app, final String[] packages) {
     int i = 0;
     final int finalI1 = i; // Must be final for lambda expression
-    Package current =
-        app.packages().stream().filter(p -> p.name().equals(packages[finalI1])).findFirst()
-            .orElse(null);
+    Package current = app.packages().stream().filter(p -> p.name().equals(packages[finalI1]))
+        .findFirst().orElse(null);
     if (current == null) {
       return 0;
     }
@@ -108,17 +107,16 @@ public final class PackageHelper {
     if (path == null || path.length == 0) {
       throw new LandscapeAssemblyException("Path must at least contain a root");
     }
-    final LandscapeAssemblyException noSuchPathException =
-        new LandscapeAssemblyException("No such path in given application");
+    final LandscapeAssemblyException noSuchPathException = new LandscapeAssemblyException(
+        "No such path in given application");
 
     Package current = app.packages().stream().filter(p -> p.name().equals(path[0])).findFirst()
         .orElseThrow(() -> noSuchPathException);
 
     for (int i = 1; i < path.length; i++) {
       final int finalI = i;
-      current =
-          current.subPackages().stream().filter(p -> p.name().equals(path[finalI])).findFirst()
-              .orElseThrow(() -> noSuchPathException);
+      current = current.subPackages().stream().filter(p -> p.name().equals(path[finalI]))
+          .findFirst().orElseThrow(() -> noSuchPathException);
     }
     return current;
   }

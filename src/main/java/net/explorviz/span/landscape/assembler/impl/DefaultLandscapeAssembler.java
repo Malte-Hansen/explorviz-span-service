@@ -20,6 +20,7 @@ import net.explorviz.span.landscape.loader.LandscapeRecord;
  */
 @ApplicationScoped
 public class DefaultLandscapeAssembler implements LandscapeAssembler {
+
   @Override
   public Landscape assembleFromRecords(final Collection<LandscapeRecord> records) {
     final UUID token =

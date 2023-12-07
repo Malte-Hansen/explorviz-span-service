@@ -8,4 +8,5 @@ public record Application(
     int instance, // TODO: Deviation from frontend, expects `String instanceId`
     List<Package> packages
 ) {
+
 }

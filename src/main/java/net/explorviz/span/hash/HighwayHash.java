@@ -7,6 +7,7 @@ package net.explorviz.span.hash;
  * Originally licensed under Apache License version 2.0.
  */
 public final class HighwayHash {
+
   private final long[] v0 = new long[4];
   private final long[] v1 = new long[4];
   private final long[] mul0 = new long[4];

@@ -7,4 +7,5 @@ public record Package(
     List<Package> subPackages,
     List<Class> classes
 ) {
+
 }

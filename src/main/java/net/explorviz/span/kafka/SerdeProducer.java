@@ -16,6 +16,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  */
 @Dependent
 public class SerdeProducer {
+
   @Inject
   /* default */ SchemaRegistryClient registry;
 

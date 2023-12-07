@@ -11,6 +11,7 @@ import net.explorviz.span.landscape.Package;
  * Utility class that provides various methods for finding elements in a landscape graph.
  */
 public final class AssemblyUtils {
+
   private AssemblyUtils() {
     /* Utility Class */
   }

@@ -12,6 +12,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import java.time.Instant;
 import java.util.UUID;
 import net.explorviz.span.landscape.Landscape;
 import net.explorviz.span.landscape.assembler.LandscapeAssembler;
@@ -67,7 +68,7 @@ public class LandscapeResource {
     } else {
       // TODO: Remove millisecond/nanosecond mismatch hotfix
       recordMulti =
-          landscapeLoader.loadLandscape(parseUuid(token), from * 1_000_000L, to * 1_000_000L);
+          landscapeLoader.loadLandscape(parseUuid(token), from, to);
     }
 
     return recordMulti.collect().asList().map(landscapeAssembler::assembleFromRecords)
@@ -83,23 +84,28 @@ public class LandscapeResource {
   public Multi<Trace> getDynamic(@PathParam("token") final String token,
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
 
-    if (!isTimeVerificationEnabled) {
-      LOGGER.atWarn().log("Time ranges are disabled, will always return ALL traces");
+    if (!isTimeVerificationEnabled || (from == null && to == null)) {
+      if(!isTimeVerificationEnabled) {
+        LOGGER.atWarn().log("Time ranges are disabled, will always return ALL traces");
+      }
       return traceLoader.loadAllTraces(parseUuid(token));
     }
 
-    if (from == null || to == null) {
-      throw new BadRequestException("from and to are required");
+    if (from == null) {
+      return traceLoader.loadTraces(parseUuid(token), Instant.EPOCH.toEpochMilli(), to);
     }
 
-    // TODO: Remove millisecond/nanosecond mismatch hotfix
-    return traceLoader.loadTraces(parseUuid(token), from * 1_000_000L, to * 1_000_000L);
+    if (to == null) {
+      return traceLoader.loadTraces(parseUuid(token), from, Instant.EPOCH.toEpochMilli());
+    }
+
+    return traceLoader.loadTraces(parseUuid(token), from, to);
   }
 
   @GET
   @Path("/{token}/dynamic/{traceid}")
   public Uni<Trace> getDynamicTrace(@PathParam("token") final String token,
-      @PathParam("traceid") final Long traceId) {
+      @PathParam("traceid") final String traceId) {
     return traceLoader.loadTrace(parseUuid(token), traceId);
   }
 

@@ -12,6 +12,7 @@ import org.apache.kafka.streams.errors.ProductionExceptionHandler;
  * proceed.
  */
 public class IgnoreRecordTooLargeHandler implements ProductionExceptionHandler {
+
   @Override
   public void configure(final Map<String, ?> configs) {
     // Nothing to do

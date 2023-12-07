@@ -7,4 +7,5 @@ public record Landscape(
     UUID landscapeToken,
     List<Node> nodes
 ) {
+
 }
