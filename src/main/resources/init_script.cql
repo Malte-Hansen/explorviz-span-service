@@ -8,12 +8,11 @@ CREATE KEYSPACE IF NOT EXISTS explorviz WITH replication = {'class':'SimpleStrat
 CREATE TABLE IF NOT EXISTS explorviz.span_by_time
 (
   landscape_token uuid,
-  start_time_s    int,
-  start_time_ns   int,
-  method_hash     bigint,
-  span_id         bigint,
-  trace_id        bigint, /* to be able to select full trace from span_by_traceid? */
-  PRIMARY KEY ((landscape_token, start_time_s), start_time_ns, method_hash, span_id)
+  start_time    bigint,
+  method_hash     text,
+  span_id         text,
+  trace_id        text, /* to be able to select full trace from span_by_traceid? */
+  PRIMARY KEY ((landscape_token, start_time), method_hash, span_id)
   );
 
 /* SELECT trace_id FROM traceid_by_time WHERE landscape_token = X AND start_time_s = X; */
@@ -22,14 +21,12 @@ CREATE TABLE IF NOT EXISTS explorviz.span_by_time
 CREATE TABLE IF NOT EXISTS explorviz.span_by_traceid
 (
   landscape_token uuid,
-  trace_id        bigint,
-  span_id         bigint,
-  parent_span_id  bigint,
-  start_time_s    int,
-  start_time_ns   int,
-  end_time_s      int,
-  end_time_ns     int,
-  method_hash     bigint,
+  trace_id        text,
+  span_id         text,
+  parent_span_id  text,
+  start_time    bigint,
+  end_time      bigint,
+  method_hash     text,
   PRIMARY KEY ((landscape_token, trace_id), span_id) /* parent_span_id as first clustering key to find parent=0 quickly? */
   );
 
@@ -37,9 +34,9 @@ CREATE TABLE IF NOT EXISTS explorviz.span_by_traceid
 CREATE TABLE IF NOT EXISTS explorviz.trace_by_hash
 (
   landscape_token uuid,
-  method_hash     bigint,
+  method_hash     text,
   time_bucket     int,
-  trace_id        bigint,
+  trace_id        text,
   PRIMARY KEY ((landscape_token, method_hash, time_bucket), trace_id)
   );
 
@@ -49,12 +46,10 @@ CREATE TABLE IF NOT EXISTS explorviz.trace_by_hash
 CREATE TABLE IF NOT EXISTS explorviz.trace_by_time
 (
   landscape_token uuid,
-  start_time_s    int,
-  start_time_ns   int,
-  end_time_s      int,
-  end_time_ns     int,
-  trace_id        bigint,
-  PRIMARY KEY ((landscape_token, start_time_s), start_time_ns, trace_id)
+  start_time      bigint,
+  end_time        bigint,
+  trace_id        text,
+  PRIMARY KEY ((landscape_token, start_time), trace_id)
   );
 
 /* SELECT * FROM span_by_traceid WHERE landscape_token = X AND trace_id IN (previous result); */
@@ -63,7 +58,7 @@ CREATE TABLE IF NOT EXISTS explorviz.trace_by_time
 CREATE TABLE IF NOT EXISTS explorviz.span_structure
 (
   landscape_token      uuid,
-  method_hash          bigint,
+  method_hash          text,
   node_ip_address      text,
   application_name     text,
   application_language text,

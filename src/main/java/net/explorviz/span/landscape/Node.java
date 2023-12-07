@@ -7,4 +7,5 @@ public record Node(
     // TODO: Deviation from frontend, missing `String hostName`
     List<Application> applications
 ) {
+
 }

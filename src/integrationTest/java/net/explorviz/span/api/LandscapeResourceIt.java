@@ -27,32 +27,31 @@ public class LandscapeResourceIt {
 
   @Test
   void testLoadAllStructureSpans() {
-    final long startEarly = 1701081827000000000L;
-    final long endEarly = 1701081828000000000L;
-    final long startExpected = 1701081830000000000L;
-    final long endExpected = 1701081831000000000L;
-    final long startLate = 1701081833000000000L;
-    final long endLate = 1701081834000000000L;
+    final long startEarly = 1701081827000L;
+    final long endEarly = 1701081828000L;
+    final long startExpected = 1701081830000L;
+    final long endExpected = 1701081831000L;
+    final long startLate = 1701081833000L;
+    final long endLate = 1701081834000L;
 
-    final PersistenceSpan differentTokenSpan =
-        new PersistenceSpan(UUID.fromString("8cd8a9a7-b840-4735-9ef0-2dbbfa01c039"), 123L, 0L, 1L,
-            startEarly, endEarly, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()",
-            847);
+    final PersistenceSpan differentTokenSpan = new PersistenceSpan(
+        UUID.fromString("8cd8a9a7-b840-4735-9ef0-2dbbfa01c039"), "123L", "", "1L", startEarly,
+        endEarly, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()", "847");
 
     final String duplicateMethodName = "myMethodName()";
     final String otherMethodName = "myOtherMethodName()";
 
-    final PersistenceSpan firstOccurenceSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 123L, 0L, 1L, startEarly, endEarly,
-            "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + duplicateMethodName, 847);
+    final PersistenceSpan firstOccurenceSpan = new PersistenceSpan(PersistenceSpan.DEFAULT_UUID,
+        "123L", "", "1L", startEarly, endEarly, "nodeIp", "app-name", "java", 0,
+        "net.explorviz.Class." + duplicateMethodName, "847");
 
-    final PersistenceSpan secondOccurenceSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 789L, 0L, 3L, startLate, endLate,
-            "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + duplicateMethodName, 847);
+    final PersistenceSpan secondOccurenceSpan = new PersistenceSpan(PersistenceSpan.DEFAULT_UUID,
+        "789L", "", "3L", startLate, endLate, "nodeIp", "app-name", "java", 0,
+        "net.explorviz.Class." + duplicateMethodName, "847");
 
-    final PersistenceSpan otherSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 456L, 0L, 2L, startExpected, endExpected,
-            "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + otherMethodName, 321);
+    final PersistenceSpan otherSpan = new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, "456L",
+        "0L", "", startExpected, endExpected, "nodeIp", "app-name", "java", 0,
+        "net.explorviz.Class." + otherMethodName, "321");
 
     spanProcessor.accept(differentTokenSpan);
     spanProcessor.accept(firstOccurenceSpan);
@@ -64,9 +63,8 @@ public class LandscapeResourceIt {
 
     final Landscape result = response.getBody().as(Landscape.class);
 
-    final List<Method> resultMethodList =
-        result.nodes().get(0).applications().get(0).packages().get(0).subPackages().get(0).classes()
-            .get(0).methods();
+    final List<Method> resultMethodList = result.nodes().get(0).applications().get(0).packages()
+        .get(0).subPackages().get(0).classes().get(0).methods();
 
     Assertions.assertEquals(2, resultMethodList.size());
     Assertions.assertEquals(otherMethodName, resultMethodList.get(0).name());
@@ -75,51 +73,48 @@ public class LandscapeResourceIt {
 
   @Test
   void testLoadStructureSpansByTimeRange() {
-    final long startEarly = 1701081827000000000L;
-    final long endEarly = 1701081828000000000L;
-    final long startExpected = 1701081830000000000L;
-    final long endExpected = 1701081831000000000L;
-    final long startLate = 1701081833000000000L;
-    final long endLate = 1701081834000000000L;
+    final long startEarly = 17010818270000L;
+    final long endEarly = 1701081828000L;
+    final long startExpected = 1701081830000L;
+    final long endExpected = 1701081831000L;
+    final long startLate = 1701081833000L;
+    final long endLate = 1701081834000L;
 
-    final PersistenceSpan differentTokenSpan =
-        new PersistenceSpan(UUID.fromString("8cd8a9a7-b840-4735-9ef0-2dbbfa01c039"), 123L, 0L, 1L,
-            startEarly, endEarly, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()",
-            847);
+    final PersistenceSpan differentTokenSpan = new PersistenceSpan(
+        UUID.fromString("8cd8a9a7-b840-4735-9ef0-2dbbfa01c039"), "123L", "", "1L", startEarly,
+        endEarly, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()", "847");
 
     final String duplicateMethodName = "myMethodName()";
     final String otherMethodName = "myOtherMethodName()";
 
-    final PersistenceSpan firstOccurenceSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 123L, 0L, 1L, startEarly, endEarly,
-            "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + duplicateMethodName, 847);
+    final PersistenceSpan firstOccurenceSpan = new PersistenceSpan(PersistenceSpan.DEFAULT_UUID,
+        "123L", "", "1L", startEarly, endEarly, "nodeIp", "app-name", "java", 0,
+        "net.explorviz.Class." + duplicateMethodName, "847");
 
-    final PersistenceSpan secondOccurenceSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 789L, 0L, 3L, startLate, endLate,
-            "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + duplicateMethodName, 847);
+    final PersistenceSpan secondOccurenceSpan = new PersistenceSpan(PersistenceSpan.DEFAULT_UUID,
+        "789L", "", "3L", startLate, endLate, "nodeIp", "app-name", "java", 0,
+        "net.explorviz.Class." + duplicateMethodName, "847");
 
-    final PersistenceSpan otherSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, 456L, 0L, 2L, startExpected, endExpected,
-            "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + otherMethodName, 321);
+    final PersistenceSpan otherSpan = new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, "456L",
+        "", "2L", startExpected, endExpected, "nodeIp", "app-name", "java", 0,
+        "net.explorviz.Class." + otherMethodName, "321");
 
     spanProcessor.accept(differentTokenSpan);
     spanProcessor.accept(firstOccurenceSpan);
     spanProcessor.accept(secondOccurenceSpan);
     spanProcessor.accept(otherSpan);
 
-    final long from = startExpected / 1_000_000L;
-    final long to = endExpected / 1_000_000L;
+    final long from = startExpected;
+    final long to = endExpected;
 
-    final Response response =
-        given().pathParam("token", PersistenceSpan.DEFAULT_UUID).queryParam("from", from)
-            .queryParam("to", to).when()
-            .get("/v2/landscapes/{token}/structure");
+    final Response response = given().pathParam("token", PersistenceSpan.DEFAULT_UUID)
+        .queryParam("from", from).queryParam("to", to).when()
+        .get("/v2/landscapes/{token}/structure");
 
     final Landscape result = response.getBody().as(Landscape.class);
 
-    final List<Method> resultMethodList =
-        result.nodes().get(0).applications().get(0).packages().get(0).subPackages().get(0).classes()
-            .get(0).methods();
+    final List<Method> resultMethodList = result.nodes().get(0).applications().get(0).packages()
+        .get(0).subPackages().get(0).classes().get(0).methods();
 
     Assertions.assertEquals(1, resultMethodList.size());
     Assertions.assertEquals(otherMethodName, resultMethodList.get(0).name());

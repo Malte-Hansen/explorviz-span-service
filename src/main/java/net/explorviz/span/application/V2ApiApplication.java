@@ -8,4 +8,5 @@ import org.eclipse.microprofile.openapi.annotations.info.Info;
     description = "Exposes endpoints to retrieve spans stored in this ExplorViz instance.",
     version = "2.0"))
 public class V2ApiApplication extends Application {
+
 }

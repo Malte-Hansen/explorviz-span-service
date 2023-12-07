@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class TopologyProducer {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(TopologyProducer.class);
 
   private final AtomicInteger lastReceivedSpans = new AtomicInteger(0);
@@ -44,8 +45,8 @@ public class TopologyProducer {
   public Topology buildTopology() {
     final StreamsBuilder builder = new StreamsBuilder();
 
-    final KStream<String, Span> spanStream =
-        builder.stream(this.inTopic, Consumed.with(Serdes.String(), this.spanSerde));
+    final KStream<String, Span> spanStream = builder.stream(this.inTopic,
+        Consumed.with(Serdes.String(), this.spanSerde));
 
     spanStream.foreach((token, span) -> this.lastReceivedSpans.incrementAndGet());
 
@@ -61,12 +62,13 @@ public class TopologyProducer {
 
     // Map to our more space-efficient PersistenceSpan format
     // TODO: Move format improvements to adapter-service
-    final KStream<String, PersistenceSpan> persistenceStream =
-        spanStream.mapValues(this.spanConverter);
+    final KStream<String, PersistenceSpan> persistenceStream = spanStream.mapValues(
+        this.spanConverter);
 
     if (LOGGER.isTraceEnabled()) {
-      persistenceStream.foreach((token, span) -> LOGGER.trace("Span {} has hash code {}: {}",
-          Long.toHexString(span.spanId()), Long.toHexString(span.methodHash()), span.methodFqn()));
+      persistenceStream.foreach(
+          (token, span) -> LOGGER.trace("Span {} has hash code {}: {}", span.spanId(),
+              span.methodHash(), span.methodFqn()));
     }
 
     persistenceStream.foreach((token, span) -> persistenceProcessor.accept(span));
@@ -77,7 +79,6 @@ public class TopologyProducer {
   @Scheduled(every = "{explorviz.log.span.interval}")
   public void logStatus() {
     final int receivedSpans = this.lastReceivedSpans.getAndSet(0);
-    LOGGER.atDebug().addArgument(receivedSpans)
-        .log("Received {} spans.");
+    LOGGER.atDebug().addArgument(receivedSpans).log("Received {} spans.");
   }
 }

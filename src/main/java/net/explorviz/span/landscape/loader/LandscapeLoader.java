@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class LandscapeLoader {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(LandscapeLoader.class);
 
   private final AtomicLong lastRequestedLandscapes = new AtomicLong(0L);

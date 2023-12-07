@@ -1,6 +1,5 @@
 package net.explorviz.span.application;
 
-import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
@@ -16,7 +15,7 @@ public class StartupLogger {
   @ConfigProperty(name = "explorviz.span.api.timeverification.enabled")
   /* default */ boolean isTimeVerificationEnabled;
 
-  void onStart(@Observes StartupEvent ev) {
+  void onStart(@Observes final StartupEvent ev) {
     LOGGER.atInfo().log("The application is starting...");
 
     LOGGER.atInfo().addArgument(isTimeVerificationEnabled).log("API time ranges are enabled: {}");

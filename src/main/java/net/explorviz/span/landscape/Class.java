@@ -6,4 +6,5 @@ public record Class(
     String name,
     List<Method> methods
 ) {
+
 }

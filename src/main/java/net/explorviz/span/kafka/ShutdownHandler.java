@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 @ApplicationScoped
 public class ShutdownHandler {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHandler.class);
 
   @Inject
@@ -34,6 +35,7 @@ public class ShutdownHandler {
   }
 
   private static class ErrorStateListener implements StateListener {
+
     @Override
     public void onChange(final State newState, final State oldState) {
       if (newState == State.ERROR) {

@@ -7,13 +7,13 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.UUID;
-import net.explorviz.span.persistence.TimestampHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 @ApplicationScoped
 public class TraceLoader {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(TraceLoader.class);
 
   private final QuarkusCqlSession session;
@@ -29,8 +29,8 @@ public class TraceLoader {
     this.selectAllTraces = session.prepare(
         "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? " + "ALLOW FILTERING");
     this.selectTraceByTime = session.prepare(
-        "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? "
-            + "AND start_time_s >= ? " + "AND end_time_s <= ? " + "ALLOW FILTERING");
+        "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? " + "AND start_time >= ? "
+            + "AND end_time <= ? " + "ALLOW FILTERING");
     this.selectSpanByTraceid = session.prepare(
         "SELECT * " + "FROM span_by_traceid " + "WHERE landscape_token = ? " + "AND trace_id = ?");
   }
@@ -57,13 +57,12 @@ public class TraceLoader {
 
     // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
     // TODO: Is from/to inclusive/exclusive?
-    return session.executeReactive(
-            selectTraceByTime.bind(landscapeToken, TimestampHelper.extractAltSeconds(from),
-                //TimestampHelper.extractAltSeconds(to + 999_999_999L)
-                TimestampHelper.extractAltSeconds(to))).map(Trace::fromRow)
+    return session.executeReactive(selectTraceByTime.bind(landscapeToken, from,
+            //TimestampHelper.extractAltSeconds(to + 999_999_999L)
+            to)).map(Trace::fromRow)
         // why this? isnt this equal to the range above?
-        //.filter(trace -> trace.startTime() >= from / 1_000_000L &&
-        // trace.startTime() <= to / 1_000_000L)
+        //.filter(trace -> trace.startTime() >= from &&
+        // trace.startTime() <= to)
         .flatMap(trace -> {
           LOGGER.atTrace().addArgument(() -> trace.traceId()).log("Found trace {}");
           return session.executeReactive(selectSpanByTraceid.bind(landscapeToken, trace.traceId()))
@@ -76,7 +75,7 @@ public class TraceLoader {
 
   // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
 
-  public Uni<Trace> loadTrace(final UUID landscapeToken, final long traceId) {
+  public Uni<Trace> loadTrace(final UUID landscapeToken, final String traceId) {
     LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
         .log("Loading trace {} for token {}");
 

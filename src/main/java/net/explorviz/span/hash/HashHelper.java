@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public final class HashHelper {
+
   private static final long[] HIGHWAY_HASH_KEY =
       {0x45_78_70_6c_6f_72_56_69L, // CHECKSTYLE.SUPPRESS: Indentation
           0x7a_53_70_61_6e_73_48_69L, 0x67_68_77_61_79_48_61_73L, 0x68_43_6f_64_65_4b_65_79L};
@@ -12,7 +13,7 @@ public final class HashHelper {
     // final class
   }
 
-  public static long calculateSpanHash(final UUID landscapeToken, final String nodeIpAddress,
+  public static String calculateSpanHash(final UUID landscapeToken, final String nodeIpAddress,
       final String applicationName, final int applicationInstance, final String methodFqn) {
     final HighwayHash hash = new HighwayHash(HIGHWAY_HASH_KEY);
 
@@ -31,6 +32,6 @@ public final class HashHelper {
       hash.updateRemainder(bytes, position, remaining);
     }
 
-    return hash.finalize64();
+    return String.valueOf(hash.finalize64());
   }
 }

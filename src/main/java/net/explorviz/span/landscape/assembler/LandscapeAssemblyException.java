@@ -6,6 +6,7 @@ import java.io.Serial;
  * Thrown if a landscape could not be assembled.
  */
 public class LandscapeAssemblyException extends RuntimeException {
+
   @Serial
   private static final long serialVersionUID = -5122287416640668604L;
 
