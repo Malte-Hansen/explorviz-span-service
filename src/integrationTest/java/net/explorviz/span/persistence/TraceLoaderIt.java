@@ -75,7 +75,7 @@ public class TraceLoaderIt {
     spanProcessor.accept(expectedSpan);
     spanProcessor.accept(lateSpan);
 
-    List<Trace> result = traceLoader.loadTraces(landscapeToken, 1701081828000L,
+    List<Trace> result = traceLoader.loadTracesStartingInRange(landscapeToken, 1701081828000L,
         1701081832000L).collect().asList().await().indefinitely();
 
     Assertions.assertEquals(1, result.size(), "List of traces has wrong size.");

@@ -30,7 +30,7 @@ public class TraceLoader {
         "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? " + "ALLOW FILTERING");
     this.selectTraceByTime = session.prepare(
         "SELECT * " + "FROM trace_by_time " + "WHERE landscape_token = ? " + "AND start_time >= ? "
-            + "AND end_time <= ? " + "ALLOW FILTERING");
+            + "AND start_time <= ? " + "ALLOW FILTERING");
     this.selectSpanByTraceid = session.prepare(
         "SELECT * " + "FROM span_by_traceid " + "WHERE landscape_token = ? " + "AND trace_id = ?");
   }
@@ -51,7 +51,8 @@ public class TraceLoader {
         });
   }
 
-  public Multi<Trace> loadTraces(final UUID landscapeToken, final long from, final long to) {
+  public Multi<Trace> loadTracesStartingInRange(final UUID landscapeToken, final long from,
+      final long to) {
     LOGGER.atTrace().addArgument(landscapeToken).addArgument(from).addArgument(to)
         .log("Loading all traces for token {} in range {} to {}");
 

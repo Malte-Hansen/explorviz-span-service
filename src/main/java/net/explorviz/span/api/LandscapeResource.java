@@ -85,21 +85,23 @@ public class LandscapeResource {
       @QueryParam("from") final Long from, @QueryParam("to") final Long to) {
 
     if (!isTimeVerificationEnabled || (from == null && to == null)) {
-      if(!isTimeVerificationEnabled) {
+      if (!isTimeVerificationEnabled) {
         LOGGER.atWarn().log("Time ranges are disabled, will always return ALL traces");
       }
       return traceLoader.loadAllTraces(parseUuid(token));
     }
 
     if (from == null) {
-      return traceLoader.loadTraces(parseUuid(token), Instant.EPOCH.toEpochMilli(), to);
+      return traceLoader.loadTracesStartingInRange(parseUuid(token),
+          Instant.EPOCH.toEpochMilli(), to);
     }
 
     if (to == null) {
-      return traceLoader.loadTraces(parseUuid(token), from, Instant.EPOCH.toEpochMilli());
+      return traceLoader.loadTracesStartingInRange(parseUuid(token), from,
+          Instant.EPOCH.toEpochMilli());
     }
 
-    return traceLoader.loadTraces(parseUuid(token), from, to);
+    return traceLoader.loadTracesStartingInRange(parseUuid(token), from, to);
   }
 
   @GET
