@@ -33,7 +33,7 @@ public record Trace(
         traceCount, spanList);
   }
 
-  public static Trace fromSpanList(final List<Span> spans) {
+  /*public static Trace fromSpanList(final List<Span> spans) {
     final Optional<Span> root = spans.stream().filter(span -> span.parentSpanId().isEmpty())
         .findAny();
     if (root.isEmpty()) {
@@ -53,5 +53,5 @@ public record Trace(
 
     return new Trace(landscapeToken, traceId, startTime, endTime, duration, overallRequestCount,
         traceCount, spanList);
-  }
+  }*/
 }

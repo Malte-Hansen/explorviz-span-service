@@ -77,10 +77,11 @@ public class TraceLoader {
   // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
 
   public Uni<Trace> loadTrace(final UUID landscapeToken, final String traceId) {
-    LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
+   /*LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
         .log("Loading trace {} for token {}");
 
     return session.executeReactive(selectSpanByTraceid.bind(landscapeToken, traceId))
-        .map(Span::fromRow).collect().asList().map(Trace::fromSpanList);
+        .map(Span::fromRow).collect().asList().map(Trace::fromSpanList);*/
+    return Uni.createFrom().nullItem();
   }
 }
