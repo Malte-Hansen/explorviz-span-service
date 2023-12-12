@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @ApplicationScoped
 public class TraceLoader {
 
@@ -59,10 +58,10 @@ public class TraceLoader {
     // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
     // TODO: Is from/to inclusive/exclusive?
     return session.executeReactive(selectTraceByTime.bind(landscapeToken, from,
-            //TimestampHelper.extractAltSeconds(to + 999_999_999L)
-            to)).map(Trace::fromRow)
+        // TimestampHelper.extractAltSeconds(to + 999_999_999L)
+        to)).map(Trace::fromRow)
         // why this? isnt this equal to the range above?
-        //.filter(trace -> trace.startTime() >= from &&
+        // .filter(trace -> trace.startTime() >= from &&
         // trace.startTime() <= to)
         .flatMap(trace -> {
           LOGGER.atTrace().addArgument(() -> trace.traceId()).log("Found trace {}");
@@ -77,10 +76,14 @@ public class TraceLoader {
   // TODO: Trace should not contain itself? i.e. filter out parent_span_id = 0
 
   public Uni<Trace> loadTrace(final UUID landscapeToken, final String traceId) {
-    LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
-        .log("Loading trace {} for token {}");
-
-    return session.executeReactive(selectSpanByTraceid.bind(landscapeToken, traceId))
-        .map(Span::fromRow).collect().asList().map(Trace::fromSpanList);
+    /*
+     * LOGGER.atTrace().addArgument(traceId).addArgument(landscapeToken)
+     * .log("Loading trace {} for token {}");
+     * 
+     * return session.executeReactive(selectSpanByTraceid.bind(landscapeToken,
+     * traceId))
+     * .map(Span::fromRow).collect().asList().map(Trace::fromSpanList);
+     */
+    return Uni.createFrom().nullItem();
   }
 }

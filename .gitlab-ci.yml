@@ -39,7 +39,6 @@ pmd:
   tags:
     - exec-docker
   script: ./gradlew pmdMain
-  allow_failure: true
   artifacts:
     paths:
       - build
@@ -49,7 +48,6 @@ checkstyle:
   tags:
     - exec-docker
   script: ./gradlew checkstyleMain
-  allow_failure: true
   artifacts:
     paths:
       - build

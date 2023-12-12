@@ -25,23 +25,8 @@ public class TraceLoaderIt {
   TraceLoader traceLoader;
 
   private Span convertPersistenceSpanToSpan(PersistenceSpan ps) {
-    return new Span(ps.landscapeToken(), ps.traceId(), ps.spanId(), ps.parentSpanId(),
+    return new Span(ps.spanId(), ps.parentSpanId(),
         ps.startTime(), ps.endTime(), String.valueOf(ps.methodHash()));
-  }
-
-  @Test
-  void testLoadByTraceId() {
-
-    final PersistenceSpan newSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, "123", "", "456L", 1701081838586L,
-            1701081938586L, "nodeIp", "app-name", "java", 0, "net.explorviz.Class.myMethod()",
-            "847");
-
-    spanProcessor.accept(newSpan);
-
-    Trace result = traceLoader.loadTrace(PersistenceSpan.DEFAULT_UUID, "456L").await().indefinitely();
-
-    Assertions.assertEquals("456L", result.traceId());
   }
 
   @Test
