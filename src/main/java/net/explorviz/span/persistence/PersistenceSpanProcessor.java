@@ -37,6 +37,7 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
   //private final PreparedStatement insertTraceByHashStatement;
   private final PreparedStatement insertTraceByTimeStatement;
   private final PreparedStatement insertSpanStructureStatement;
+  private final PreparedStatement updateSpanBucketCounter;
 
   @Inject
   public PersistenceSpanProcessor(final QuarkusCqlSession session) {
@@ -60,6 +61,9 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
         + "(landscape_token, method_hash, node_ip_address, application_name, application_language, "
         + "application_instance, method_fqn, time_seen) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
         + "USING TIMESTAMP ?");
+    this.updateSpanBucketCounter = session.prepare("UPDATE span_count_per_time_bucket_and_token "
+        + "SET span_count = span_count + 1 "
+        + "WHERE landscape_token = ? AND ten_second_epoch = ?");
   }
 
   @Override
@@ -81,8 +85,20 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
 
     insertSpanDynamic(span);
 
+    updateSpanBucketCounter(span);
+
     lastProcessedSpans.incrementAndGet();
   }
+
+  private void updateSpanBucketCounter(final PersistenceSpan span) {
+    final long tenSecondBucket = span.startTime() - (span.startTime() % 10_000);
+
+    final BoundStatement updateStmt =
+        this.updateSpanBucketCounter.bind(span.landscapeToken(), tenSecondBucket);
+
+    this.session.executeAsync(updateStmt);
+  }
+
 
   private void insertSpanStructure(final PersistenceSpan span) {
     final BoundStatement stmtStructure =
