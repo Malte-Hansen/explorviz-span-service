@@ -3,8 +3,8 @@ package net.explorviz.span.persistence;
 import com.datastax.oss.quarkus.test.CassandraTestResource;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import java.util.List;
 import jakarta.inject.Inject;
+import java.util.List;
 import java.util.UUID;
 import net.explorviz.span.kafka.KafkaTestResource;
 import net.explorviz.span.trace.Span;
@@ -36,10 +36,10 @@ public class TraceLoaderIt {
     long endEarly = 1701081828000L;
     long startExpected = 1701081830000L;
     long endExpected = 1701081831000L;
-    long startLate = 1701081833000L;
-    long endLate = 1701081834000L;
+    long startLate = 1701081843000L;
+    long endLate = 1701081844000L;
 
-    UUID landscapeToken = UUID.fromString("1cd8a9a7-b840-4735-9ef0-2dbbfa01c039");
+    final UUID landscapeToken = UUID.randomUUID();
 
     final PersistenceSpan earlySpan =
         new PersistenceSpan(landscapeToken, "123L", "", "1L", startEarly,
@@ -60,12 +60,14 @@ public class TraceLoaderIt {
     spanProcessor.accept(expectedSpan);
     spanProcessor.accept(lateSpan);
 
-    List<Trace> result = traceLoader.loadTracesStartingInRange(landscapeToken, 1701081828000L,
-        1701081832000L).collect().asList().await().indefinitely();
+    List<Trace> result =
+        traceLoader.loadTracesStartingInRange(landscapeToken, 1701081830000L).collect().asList()
+            .await().indefinitely();
 
     Assertions.assertEquals(1, result.size(), "List of traces has wrong size.");
     Assertions.assertEquals(1, result.get(0).spanList().size(), "List of spans has wrong size.");
-    Assertions.assertEquals(convertPersistenceSpanToSpan(expectedSpan), result.get(0).spanList().get(0), "Wrong span in trace.");
+    Assertions.assertEquals(convertPersistenceSpanToSpan(expectedSpan),
+        result.get(0).spanList().get(0), "Wrong span in trace.");
   }
 
 }

@@ -91,17 +91,7 @@ public class LandscapeResource {
       return traceLoader.loadAllTraces(parseUuid(token));
     }
 
-    if (from == null) {
-      return traceLoader.loadTracesStartingInRange(parseUuid(token),
-          Instant.EPOCH.toEpochMilli(), to);
-    }
-
-    if (to == null) {
-      return traceLoader.loadTracesStartingInRange(parseUuid(token), from,
-          Instant.EPOCH.toEpochMilli());
-    }
-
-    return traceLoader.loadTracesStartingInRange(parseUuid(token), from, to);
+    return traceLoader.loadTracesStartingInRange(parseUuid(token), from);
   }
 
   @GET

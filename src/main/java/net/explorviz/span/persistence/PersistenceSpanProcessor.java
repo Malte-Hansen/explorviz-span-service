@@ -55,15 +55,15 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
             + "(landscape_token, method_hash, time_bucket, trace_id) "
             + "VALUES (?, ?, ?, ?)");*/
     this.insertTraceByTimeStatement = session.prepare("INSERT INTO trace_by_time "
-        + "(landscape_token, start_time, end_time, trace_id) "
-        + "VALUES (?, ?, ?, ?)");
+        + "(landscape_token, tenth_second_epoch, start_time, end_time, trace_id) "
+        + "VALUES (?, ?, ?, ?, ?)");
     this.insertSpanStructureStatement = session.prepare("INSERT INTO span_structure "
         + "(landscape_token, method_hash, node_ip_address, application_name, application_language, "
         + "application_instance, method_fqn, time_seen) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
         + "USING TIMESTAMP ?");
     this.updateSpanBucketCounter = session.prepare("UPDATE span_count_per_time_bucket_and_token "
         + "SET span_count = span_count + 1 "
-        + "WHERE landscape_token = ? AND ten_second_epoch = ?");
+        + "WHERE landscape_token = ? AND tenth_second_epoch = ?");
   }
 
   @Override
@@ -165,14 +165,19 @@ public class PersistenceSpanProcessor implements Consumer<PersistenceSpan> {
   }
 
   private void insertTrace(final PersistenceSpan span) {
-    final BoundStatement stmtByTime = insertTraceByTimeStatement.bind(span.landscapeToken(),
-        span.startTime(), span.endTime(), span.traceId());
+    final long tenSecondBucket = span.startTime() - (span.startTime() % 10_000);
+
+    final BoundStatement stmtByTime =
+        insertTraceByTimeStatement.bind(span.landscapeToken(), tenSecondBucket,
+            span.startTime(), span.endTime(), span.traceId());
 
     session.executeAsync(stmtByTime).whenComplete((result, failure) -> {
       if (failure == null) {
         lastSavedTraces.incrementAndGet();
         LOGGER.atTrace().addArgument(span::landscapeToken).addArgument(span::traceId)
-            .addArgument(span::traceId).log("Saved new trace with token={}, trace_id={}");
+            .addArgument(tenSecondBucket)
+            .addArgument(span::traceId)
+            .log("Saved new trace with token={}, trace_id={}, and ten second epoch bucket={}");
       } else {
         lastFailures.incrementAndGet();
         //LOGGER.error("Could not persist trace by time", failure);

@@ -29,7 +29,7 @@ public class TimestampLoader {
 
     this.selectNewerTimestampsForToken = session.prepare(
         "SELECT * " + "FROM span_count_per_time_bucket_and_token "
-            + "WHERE landscape_token = ? AND ten_second_epoch > ?");
+            + "WHERE landscape_token = ? AND tenth_second_epoch > ?");
   }
 
   public Multi<Timestamp> loadAllTimestampsForToken(final UUID landscapeToken) {

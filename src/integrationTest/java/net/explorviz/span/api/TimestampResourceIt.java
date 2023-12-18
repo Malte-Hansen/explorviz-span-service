@@ -35,8 +35,10 @@ public class TimestampResourceIt {
     final long startLate = startEarly + 10_000;
     final long endLate = startLate + 1000;
 
+    final UUID uuidExpected = UUID.randomUUID();
+
     final PersistenceSpan differentTokenSpan =
-        new PersistenceSpan(UUID.fromString("8cd8a9a7-b840-4735-9ef0-2dbbfa01c039"), "123L", "",
+        new PersistenceSpan(UUID.randomUUID(), "123L", "",
             "1L", startEarly, endEarly, "nodeIp", "app-name", "java", 0,
             "net.explorviz.Class.myMethod()", "847");
 
@@ -44,15 +46,15 @@ public class TimestampResourceIt {
     final String otherMethodName = "myOtherMethodName()";
 
     final PersistenceSpan firstOccurenceSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, "123L", "", "1L", startEarly, endEarly,
+        new PersistenceSpan(uuidExpected, "123L", "", "1L", startEarly, endEarly,
             "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + duplicateMethodName, "847");
 
     final PersistenceSpan secondOccurenceSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, "789L", "", "3L", startLate, endLate,
+        new PersistenceSpan(uuidExpected, "789L", "", "3L", startLate, endLate,
             "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + duplicateMethodName, "847");
 
     final PersistenceSpan otherSpan =
-        new PersistenceSpan(PersistenceSpan.DEFAULT_UUID, "456L", "0L", "", startExpected,
+        new PersistenceSpan(uuidExpected, "456L", "0L", "", startExpected,
             endExpected, "nodeIp", "app-name", "java", 0, "net.explorviz.Class." + otherMethodName,
             "321");
 
@@ -61,7 +63,7 @@ public class TimestampResourceIt {
     spanProcessor.accept(secondOccurenceSpan);
     spanProcessor.accept(otherSpan);
 
-    final Response response = given().pathParam("token", PersistenceSpan.DEFAULT_UUID).when()
+    final Response response = given().pathParam("token", uuidExpected).when()
         .get("/v2/landscapes/{token}/timestamps");
 
     final List<Timestamp> resultList = response.getBody().as(new TypeRef<List<Timestamp>>() {
