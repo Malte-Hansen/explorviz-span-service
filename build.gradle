@@ -20,7 +20,7 @@ dependencies {
 
   implementation 'io.quarkus:quarkus-container-image-jib'
 
-  // Needed for @Scheduled annotations
+  // Needed for scheduled jobs
   implementation 'io.quarkus:quarkus-scheduler'
 
   // Quarkus Cassandra Platform + DataStax Cassandra Driver
