@@ -99,6 +99,7 @@ push-dockerhub-main:
   extends: .push-dockerhub-base-job
 
 push-dockerhub-mr:
+  stage: publish
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
