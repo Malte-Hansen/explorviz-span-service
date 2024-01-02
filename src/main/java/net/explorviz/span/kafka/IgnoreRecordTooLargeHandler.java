@@ -1,5 +1,6 @@
 package net.explorviz.span.kafka;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.RecordTooLargeException;
@@ -11,6 +12,7 @@ import org.apache.kafka.streams.errors.ProductionExceptionHandler;
  * that should shut down the application. Therefore, we catch the exception, discard the record, and
  * proceed.
  */
+@RegisterForReflection
 public class IgnoreRecordTooLargeHandler implements ProductionExceptionHandler {
 
   @Override
