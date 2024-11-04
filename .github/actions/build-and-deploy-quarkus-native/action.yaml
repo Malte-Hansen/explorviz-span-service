@@ -1,0 +1,33 @@
+name: Build and Deploy Quarkus Native Image
+description: Build and deploy Quarkus native image to DockerHub
+inputs:
+  image-name:
+    description: Docker image name
+    required: true
+  image-tag:
+    description: Docker image tag
+    required: true
+outputs: {}
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up GraalVM
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'graalvm'
+        java-version: '21'  # Adjust version as needed
+    - name: Log in to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: Build Quarkus Native Image
+      run: |
+        ./gradlew clean assemble \
+          -Dquarkus.package.type=native \
+          -Dquarkus.container-image.push=true \
+          -Dquarkus.container-image.name=${{ inputs.image-name }} \
+          -Dquarkus.container-image.tag=${{ inputs.image-tag }} \
+          -Dquarkus.native.additional-build-args="--initialize-at-run-time=org.apache.kafka.common.security.authenticator.SaslClientAuthenticator\,org.apache.kafka.common.security.oauthbearer.internals.expiring.ExpiringCredentialRefreshingLogin" \
+          -Dquarkus.container-image.username=${{ secrets.DOCKERHUB_USERNAME }} \
+          -Dquarkus.container-image.password=${{ secrets.DOCKERHUB_PASSWORD }}
