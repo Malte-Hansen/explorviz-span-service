@@ -154,7 +154,7 @@ jobs:
     name: Push Native Image (ARM64)
     runs-on: ubuntu-latest
     needs: [build, pmd, checkstyle, unit-test]
-    if: github.ref == 'refs/heads/main' && env.ARM64_BUILD == 'true'
+    #FIXME if: github.ref == 'refs/heads/main' && env.ARM64_BUILD == 'true'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
