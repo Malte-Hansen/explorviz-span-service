@@ -8,6 +8,9 @@ on:
     branches:
       - '**'
 
+env:
+  IMAGE_REGISTRY: ghcr.io/hu1buerger/explorviz-span-service # TODO: set in github as env var
+
 jobs:
   build:
     name: Build
@@ -157,7 +160,7 @@ jobs:
       - name: Build and Deploy Quarkus Native Image
         uses: ./.github/actions/build-and-deploy-quarkus-native
         with:
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME_NATIVE }}
+          image-name: ${{ env.IMAGE_REGISTRY }}
           image-tag: 'amd64'
 
   push-dockerhub-native-main-arm64:
@@ -178,91 +181,6 @@ jobs:
       - name: Build and Deploy Quarkus Native Image
         uses: ./.github/actions/build-and-deploy-quarkus-native
         with:
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME_NATIVE }}
+          image-name: ${{ env.IMAGE_REGISTRY }}
           image-tag: 'arm64'
 
-  retag-amd64-as-latest-native:
-    name: Retag AMD64 as Latest (Native)
-    runs-on: ubuntu-latest
-    needs: push-dockerhub-native-main-amd64
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Retag DockerHub Image
-        uses: ./.github/actions/retag-dockerhub-image
-        with:
-          source-tag: 'amd64'
-          target-tag: 'latest'
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME_NATIVE }}
-
-  publish-multi-arch-manifest-native:
-    name: Publish Multi-Arch Manifest (Native)
-    runs-on: ubuntu-latest
-    needs: [push-dockerhub-native-main-amd64, push-dockerhub-native-main-arm64]
-    #if: env.MULTI_ARCH_BUILD == 'true'
-    steps:
-      - name: Publish Multi-Arch Manifest
-        uses: ./.github/actions/publish-multi-arch-manifest
-        with:
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME_NATIVE }}
-          target-tag: 'latest'
-
-  push-dockerhub-main-amd64:
-    name: Push JVM Image (AMD64)
-    runs-on: ubuntu-latest
-    needs: [build, pmd, checkstyle, unit-test]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Build and Deploy Quarkus JVM Image
-        uses: ./.github/actions/build-and-deploy-quarkus-jvm
-        with:
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-          image-tag: 'amd64'
-
-  push-dockerhub-main-arm64:
-    name: Push JVM Image (ARM64)
-    runs-on: ubuntu-latest
-    needs: [build, pmd, checkstyle, unit-test]
-    if: github.ref == 'refs/heads/main' #&& env.ARM64_BUILD == 'true'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup ARM64 Emulation
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu binfmt-support qemu-user-static
-          docker run --privileged --rm tonistiigi/binfmt --install all
-
-      - name: Build and Deploy Quarkus JVM Image
-        uses: ./.github/actions/build-and-deploy-quarkus-jvm
-        with:
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-          image-tag: 'arm64'
-
-  retag-amd64-as-latest-jvm:
-    name: Retag AMD64 as Latest (JVM)
-    runs-on: ubuntu-latest
-    needs: push-dockerhub-main-amd64
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Retag DockerHub Image
-        uses: ./.github/actions/retag-dockerhub-image
-        with:
-          source-tag: 'amd64'
-          target-tag: 'latest'
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-
-  publish-multi-arch-manifest-jvm:
-    name: Publish Multi-Arch Manifest (JVM)
-    runs-on: ubuntu-latest
-    needs: [push-dockerhub-main-amd64, push-dockerhub-main-arm64]
-    #if: env.MULTI_ARCH_BUILD == 'true'
-    steps:
-      - name: Publish Multi-Arch Manifest
-        uses: ./.github/actions/publish-multi-arch-manifest
-        with:
-          image-name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-          target-tag: 'latest'
