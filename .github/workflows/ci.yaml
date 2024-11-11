@@ -162,6 +162,8 @@ jobs:
         with:
           image-name: ${{ env.IMAGE_REGISTRY }}
           image-tag: 'amd64'
+          reg-username: ${{ github.actor }}
+          reg-token: ${{ secrets.GITHUB_TOKEN }}
 
   push-dockerhub-native-main-arm64:
     name: Push Native Image (ARM64)
@@ -183,4 +185,6 @@ jobs:
         with:
           image-name: ${{ env.IMAGE_REGISTRY }}
           image-tag: 'arm64'
+          reg-username: ${{ github.actor }}
+          reg-token: ${{ secrets.GITHUB_TOKEN }}
 

@@ -16,8 +16,12 @@ runs:
       with:
         distribution: 'temurin'
         java-version: '11'
-    - name: Log in to DockerHub
-      uses: ./.github/actions/authorise-oci-reg
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build Quarkus JVM Image
       shell: sh
       run: |
