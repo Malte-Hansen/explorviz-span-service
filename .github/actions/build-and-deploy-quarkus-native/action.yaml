@@ -27,5 +27,6 @@ runs:
           -Dquarkus.container-image.name=${{ inputs.image-name }} \
           -Dquarkus.container-image.tag=${{ inputs.image-tag }} \
           -Dquarkus.native.additional-build-args="--initialize-at-run-time=org.apache.kafka.common.security.authenticator.SaslClientAuthenticator\,org.apache.kafka.common.security.oauthbearer.internals.expiring.ExpiringCredentialRefreshingLogin" \
-          -Dquarkus.container-image.username=${{ secrets.DOCKERHUB_USERNAME }} \
-          -Dquarkus.container-image.password=${{ secrets.DOCKERHUB_PASSWORD }}
+          
+    # -Dquarkus.container-image.username=${{ secrets.DOCKERHUB_USERNAME }} \
+          #-Dquarkus.container-image.password=${{ secrets.DOCKERHUB_PASSWORD }}
