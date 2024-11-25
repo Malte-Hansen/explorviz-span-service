@@ -160,10 +160,10 @@ jobs:
       - name: Build and Deploy Quarkus Native Image
         uses: ./.github/actions/build-and-deploy-quarkus-native
         with:
-          image-name: ${{ env.IMAGE_REGISTRY }}
+          image-name: ${{ env.DOCKER_IMAGE_NAME }}
           image-tag: 'amd64'
-          reg-username: ${{ github.actor }}
-          reg-token: ${{ secrets.GITHUB_TOKEN }}
+          reg-username: ${{ secrets.DOCKER_USERNAME }}
+          reg-token: ${{ secrets.DOCKER_PASSWORD }}
 
   push-dockerhub-native-main-arm64:
     name: Push Native Image (ARM64)
@@ -183,8 +183,8 @@ jobs:
       - name: Build and Deploy Quarkus Native Image
         uses: ./.github/actions/build-and-deploy-quarkus-native
         with:
-          image-name: ${{ env.IMAGE_REGISTRY }}
+          image-name: ${{ env.DOCKER_IMAGE_NAME }}
           image-tag: 'arm64'
-          reg-username: ${{ github.actor }}
-          reg-token: ${{ secrets.GITHUB_TOKEN }}
+          reg-username: ${{ secrets.DOCKER_USERNAME }}
+          reg-token: ${{ secrets.DOCKER_PASSWORD }}
 
